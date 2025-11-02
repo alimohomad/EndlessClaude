@@ -109,7 +109,6 @@ Contributions, issues, and feature requests are welcome!
 
 ## 📋 To-Do
 
-- [ ] Add error handling for API rate limits
 - [ ] Implement proper documentation for deployment
 - [ ] Add user settings/preferences
 - [ ] Implement proper authentication
