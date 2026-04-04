@@ -519,7 +519,7 @@
         <div class="sidebar">
             <div class="sidebar-content">
                 <div class="brand">
-                    <h1>Claude 3.5</h1>
+                    <h1> 3.5</h1>
                     <p class="text-secondary">Sonnet Chat</p>
                 </div>
                 <button class="btn-custom btn-primary mb-4 w-100 d-none d-md-block" onclick="startNewChat()">
@@ -530,7 +530,7 @@
                 </div>
             </div>
             <div class="sidebar-footer">
-                <p>Powered by Claude 3.5 Sonnet</p>
+                <p>Powered by  3.5 Sonnet</p>
                 <small>Created with ❤️ and AI assistance</small>
                 <a href="https://github.com/usualdork" target="_blank" class="github-link" title="Visit my GitHub">
                     <i class="fab fa-github"></i>
@@ -687,7 +687,7 @@
                 
                 messageDiv.innerHTML = `
                     <div class="message-header">
-                        <span>${message.isUser ? 'You' : 'Claude'} • ${message.timestamp}</span>
+                        <span>${message.isUser ? 'You' : ''} • ${message.timestamp}</span>
                         <div class="message-actions">
                             <button class="btn-icon" onclick="copyMessage('${message.content.replace(/'/g, "\\'")}')">
                                 <i class="fas fa-copy"></i>
@@ -783,7 +783,7 @@
 
             try {
                 const response = await puter.ai.chat(query, {
-                    model: "anthropic/claude-3-5-sonnet",
+                    model: "claude-sonnet",
                     stream: true
                 });
 
