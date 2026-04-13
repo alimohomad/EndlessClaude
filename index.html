@@ -453,6 +453,7 @@
             display: flex;
             margin-bottom: 16px;
             animation: fadeIn 0.3s ease;
+            max-width: 100%;
         }
 
         .message.user {
@@ -481,17 +482,18 @@
             line-height: 1.6;
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .user .bubble {
-            background-color: #2F2F2F;
-            color: #FFFFFF;
+            background-color: #2F2F2F !important;
+            color: #FFFFFF !important;
             border-radius: 18px;
-            max-width: 400px;
+            max-width: 500px;
         }
 
         .ai .bubble {
-            background-color: transparent;
+            background-color: transparent !important;
             color: #E5E5E5;
             padding: 0;
             max-width: 100%;
@@ -521,6 +523,9 @@
             padding: 16px;
             overflow-x: auto;
             margin: 8px 0;
+            max-width: 100%;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .bubble code {
@@ -528,11 +533,14 @@
             font-size: 14px;
             line-height: 1.5;
             color: #E5E5E5;
+            white-space: pre-wrap;
+            word-break: break-all;
         }
 
         .bubble pre code {
             display: block;
-            white-space: pre;
+            white-space: pre-wrap;
+            word-wrap: break-word;
         }
 
         .bubble :not(pre) > code {
@@ -540,6 +548,7 @@
             padding: 2px 6px;
             border-radius: 4px;
             font-size: 13px;
+            white-space: normal;
         }
 
         /* Input Container */
