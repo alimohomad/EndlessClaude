@@ -1517,13 +1517,20 @@
                 removeLoading();
                 let fullResponse = '';
 
-                // Stream the response like the old code
+                // Stream the response - properly handle the response format
                 for await (const part of response) {
-                    fullResponse += part?.text || '';
+                    // Handle different response formats
+                    if (typeof part === 'string') {
+                        fullResponse += part;
+                    } else if (part?.text) {
+                        fullResponse += part.text;
+                    } else if (part?.type === 'text' && part?.text) {
+                        fullResponse += part.text;
+                    }
                 }
 
-                // Log the raw response to debug
-                console.log('Raw response:', fullResponse);
+                // Debug: log what we received
+                console.log('Final response:', fullResponse);
 
                 addMessage(fullResponse, false);
             } catch (error) {
