@@ -70,7 +70,7 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
         updatedApiKeys.splice(randomIndex, 1);
 
         const payload = {
-            model: data.model || "minimax/minimax-m2.5:free",
+            model: data.model || "nvidia/nemotron-3-super-120b-a12b:free",
             messages: data.messages,
             stream: true
         };
