@@ -1485,35 +1485,19 @@
             showLoading();
 
             try {
-                // Add instruction to format code properly
-                const enhancedMessage = message + "\n\n(Please format any code examples using markdown code blocks with triple backticks ```)";
-                
-                // Call Puter AI with Claude Sonnet
-                const response = await puter.ai.chat(enhancedMessage, {
+                // Call Puter AI with Claude Sonnet - using stream like the old working code
+                const response = await puter.ai.chat(message, {
                     model: 'claude-sonnet',
-                    stream: false
+                    stream: true
                 });
 
                 removeLoading();
-                
-                // Get the full response text
                 let fullResponse = '';
-                if (typeof response === 'string') {
-                    fullResponse = response;
-                } else if (response.message) {
-                    fullResponse = response.message;
-                } else if (response.text) {
-                    fullResponse = response.text;
-                } else if (response.content) {
-                    fullResponse = response.content;
-                } else {
-                    // Try to extract text from response object
-                    fullResponse = JSON.stringify(response);
-                }
 
-                // Log the raw response for debugging
-                console.log('Raw AI Response:', response);
-                console.log('Processed Response:', fullResponse);
+                // Stream the response like the old code
+                for await (const part of response) {
+                    fullResponse += part?.text || '';
+                }
 
                 addMessage(fullResponse, false);
             } catch (error) {
