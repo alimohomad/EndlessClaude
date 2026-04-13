@@ -4,23 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Claude AI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://js.puter.com/v2/"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap');
+        
         body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
             background-color: #0D0D0D;
             color: #FFFFFF;
             height: 100vh;
@@ -31,22 +28,63 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        .container {
-            display: flex;
-            height: 100vh;
+        .claude-logo {
+            font-family: 'Source Serif 4', serif;
         }
 
-        .sidebar {
-            width: 320px;
-            min-width: 320px;
-            max-width: 320px;
-            background-color: #171717;
+        .sidebar-item {
             display: flex;
-            flex-direction: column;
-            padding: 0;
-            border-right: 1px solid #2A2A2A;
-            overflow: hidden;
-            height: 100vh;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            transition: background-color 0.2s;
+            cursor: pointer;
+            font-size: 14px;
+            color: #b4b4b4;
+        }
+
+        .sidebar-item:hover {
+            background-color: #202020;
+            color: #ffffff;
+        }
+
+        .active-item {
+            background-color: #202020;
+            color: #ffffff;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #666666;
+            margin: 24px 12px 8px 12px;
+        }
+
+        .recent-item {
+            padding: 8px 12px;
+            font-size: 14px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: #b4b4b4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .recent-item:hover {
+            background-color: #202020;
+            color: #ffffff;
+        }
+
+        /* Scrollbar styling */
+        .custom-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
         }
 
         .sidebar-top {
@@ -1083,73 +1121,110 @@
         </div>
     </div>
 
-    <div class="container hidden" id="mainContainer">
-        <!-- Sidebar -->
-        <div class="sidebar">
-            <div class="sidebar-top">
-                <div class="sidebar-brand">
-                    <span class="brand-text">Claude</span>
-                    <button class="footer-btn">
-                        <i data-lucide="panel-left-close"></i>
-                    </button>
+    <div class="flex h-screen overflow-hidden hidden" id="mainContainer">
+        <!-- Sidebar Container -->
+        <aside class="w-[280px] bg-[#171717] flex flex-col h-full border-r border-[#262626]">
+            <!-- Header -->
+            <div class="p-4 flex items-center justify-between">
+                <h1 class="claude-logo text-2xl text-white font-semibold">Claude</h1>
+                <button class="p-1.5 hover:bg-[#202020] rounded-lg transition-colors text-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="18" height="18" x="3" y="3" rx="2"/>
+                        <path d="M9 3v18"/>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Main Actions -->
+            <div class="px-2 flex flex-col gap-0.5">
+                <div class="sidebar-item" onclick="startNewChat()">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"/>
+                        <path d="M12 5v14"/>
+                    </svg>
+                    <span>New chat</span>
                 </div>
-                
-                <div class="sidebar-nav">
-                    <div class="nav-item" onclick="startNewChat()">
-                        <i data-lucide="plus"></i>
-                        <span>New chat</span>
-                    </div>
-                    <div class="nav-item">
-                        <i data-lucide="search"></i>
-                        <span>Search</span>
-                    </div>
-                    <div class="nav-item">
-                        <i data-lucide="briefcase"></i>
-                        <span>Customize</span>
-                    </div>
+                <div class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"/>
+                        <path d="m21 21-4.3-4.3"/>
+                    </svg>
+                    <span>Search</span>
+                </div>
+                <div class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
+                        <rect width="20" height="14" x="2" y="6" rx="2"/>
+                    </svg>
+                    <span>Customize</span>
                 </div>
             </div>
 
-            <div class="sidebar-section">
-                <div class="section-title">Recents</div>
-                <div class="chat-list" id="chatList"></div>
+            <!-- Navigation -->
+            <div class="px-2 mt-4 flex flex-col gap-0.5">
+                <div class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
+                    </svg>
+                    <span>Chats</span>
+                </div>
+                <div class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <rect width="20" height="16" x="2" y="4" rx="2"/>
+                        <path d="M2 8h20"/>
+                        <path d="M15 2v2"/>
+                        <path d="M9 2v2"/>
+                    </svg>
+                    <span>Projects</span>
+                </div>
+                <div class="sidebar-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="12" cy="5" r="1"/>
+                        <circle cx="12" cy="19" r="1"/>
+                        <circle cx="19" cy="12" r="1"/>
+                        <circle cx="5" cy="12" r="1"/>
+                    </svg>
+                    <span>Artifacts</span>
+                </div>
             </div>
 
-            <div class="sidebar-bottom">
-                <div class="sidebar-nav">
-                    <div class="nav-item">
-                        <i data-lucide="message-circle"></i>
-                        <span>Chats</span>
-                    </div>
-                    <div class="nav-item">
-                        <i data-lucide="folder"></i>
-                        <span>Projects</span>
-                    </div>
-                    <div class="nav-item">
-                        <i data-lucide="package"></i>
-                        <span>Artifacts</span>
-                    </div>
-                </div>
+            <!-- Recents Section -->
+            <div class="flex-1 overflow-y-auto custom-scroll px-2">
+                <div class="section-label">Recents</div>
+                <div id="chatList"></div>
+            </div>
 
-                <div class="sidebar-footer">
-                    <div class="user-profile">
-                        <div class="user-avatar">R</div>
-                        <div class="user-info">
-                            <div class="user-name">raj</div>
-                            <div class="user-plan">Premium workspace</div>
+            <!-- User Profile Section -->
+            <div class="mt-auto p-4 border-t border-[#262626]">
+                <div class="flex items-center justify-between group cursor-pointer">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-[#d9d9d1] text-[#171717] flex items-center justify-center font-bold text-lg">R</div>
+                        <div class="flex flex-col">
+                            <span class="text-sm font-medium text-white">raj</span>
+                            <span class="text-xs text-gray-500">Free plan</span>
                         </div>
                     </div>
-                    <div class="footer-actions">
-                        <button class="footer-btn">
-                            <i data-lucide="download"></i>
+                    <div class="flex items-center gap-2 text-gray-500">
+                        <button class="p-1.5 hover:bg-[#202020] rounded-lg">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                <polyline points="7 10 12 15 17 10"/>
+                                <line x1="12" x2="12" y1="15" y2="3"/>
+                            </svg>
                         </button>
-                        <button class="footer-btn">
-                            <i data-lucide="arrow-up"></i>
+                        <button class="flex flex-col gap-0.5 items-center justify-center hover:bg-[#202020] p-1 rounded">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m18 15-6-6-6 6"/>
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="m6 9 6 6 6-6"/>
+                            </svg>
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
+        </aside>
 
         <!-- Main Content -->
         <div class="main-content">
@@ -1293,30 +1368,32 @@
             
             allChats.forEach(chat => {
                 const chatItem = document.createElement('div');
-                chatItem.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
+                chatItem.className = `recent-item ${chat.id === currentChatId ? 'active-item' : ''}`;
                 
-                const titleSpan = document.createElement('span');
-                titleSpan.className = 'chat-title';
-                titleSpan.textContent = chat.title;
+                const firstMessage = chat.messages[0]?.content || 'New Chat';
+                const truncatedMessage = firstMessage.substring(0, 30) + (firstMessage.length > 30 ? '...' : '');
                 
-                const optionsBtn = document.createElement('div');
-                optionsBtn.className = 'chat-options';
-                optionsBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>';
-                optionsBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    if (confirm('Delete this chat?')) {
-                        deleteChat(chat.id);
+                chatItem.innerHTML = `
+                    <span class="truncate">${truncatedMessage}</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400">
+                        <circle cx="12" cy="12" r="1"/>
+                        <circle cx="19" cy="12" r="1"/>
+                        <circle cx="5" cy="12" r="1"/>
+                    </svg>
+                `;
+                
+                chatItem.onclick = (e) => {
+                    if (!e.target.closest('svg')) {
+                        loadChat(chat.id);
+                    } else {
+                        if (confirm('Delete this chat?')) {
+                            deleteChat(chat.id);
+                        }
                     }
                 };
                 
-                chatItem.appendChild(titleSpan);
-                chatItem.appendChild(optionsBtn);
-                chatItem.onclick = () => loadChat(chat.id);
                 chatList.appendChild(chatItem);
             });
-            
-            // Reinitialize Lucide icons
-            lucide.createIcons();
         }
 
         function deleteChat(chatId) {
