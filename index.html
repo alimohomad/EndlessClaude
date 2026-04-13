@@ -259,12 +259,15 @@
         </div>
     </div>
 
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobileSidebarOverlay" onclick="toggleSidebarMobile()" class="fixed inset-0 bg-black/50 z-[1999] hidden md:hidden"></div>
+
     <!-- Sidebar -->
     <aside id="sidebar"
-        class="w-[260px] bg-[#171717] flex flex-col h-full border-r border-[#262626] shrink-0 transition-all duration-300">
+        class="absolute md:relative z-[2000] w-[260px] bg-[#171717] flex flex-col h-full border-r border-[#262626] shrink-0 transition-all duration-300 -translate-x-full md:translate-x-0">
         <div class="p-4 flex items-center justify-between">
             <h1 id="sidebarLogo" class="font-serif text-[22px] text-white font-semibold tracking-tight">Claude</h1>
-            <button onclick="toggleSidebar()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i
+            <button onclick="window.innerWidth < 768 ? toggleSidebarMobile() : toggleSidebar()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i
                     data-lucide="panel-left" class="w-[18px] h-[18px]"></i></button>
         </div>
 
@@ -323,9 +326,9 @@
                 <div class="flex items-center gap-2.5">
                     <div id="userInit"
                         class="w-8 h-8 rounded-full bg-[#d9d9d1] text-[#171717] flex items-center justify-center font-bold text-sm">
-                        R</div>
+                        U</div>
                     <div class="flex flex-col label overflow-hidden">
-                        <span id="userName" class="text-[13px] font-medium text-white leading-tight truncate">raj</span>
+                        <span id="userName" class="text-[13px] font-medium text-white leading-tight truncate">User</span>
                         <span class="text-[11px] text-[#d97757] leading-tight font-medium">Premium plan</span>
                     </div>
                 </div>
@@ -337,6 +340,12 @@
 
     <!-- Main Content Area -->
     <main class="flex-1 flex flex-col relative overflow-hidden bg-[#212121]">
+
+        <!-- Mobile Header Bar -->
+        <div class="md:hidden flex items-center p-3 border-b border-[#333]">
+            <button onclick="toggleSidebarMobile()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i data-lucide="menu" class="w-5 h-5"></i></button>
+            <span class="ml-2 font-serif text-[18px] text-white">Claude</span>
+        </div>
 
         <!-- View: Chat -->
         <div id="view-chat" class="flex-1 flex flex-col h-full relative">
@@ -353,7 +362,7 @@
                             d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z"
                             fill="currentColor" />
                     </svg>
-                    <h2 class="font-serif text-4xl text-white font-normal" id="greetingText">Good afternoon, raj</h2>
+                    <h2 class="font-serif text-4xl text-white font-normal" id="greetingText">Good afternoon, User</h2>
                 </div>
             </div>
 
@@ -495,10 +504,11 @@
 
         function onAuthenticated(user) {
             document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('userName').textContent = user.username;
-            document.getElementById('welcomeName').textContent = user.username;
-            document.getElementById('userEmail').textContent = user.email || user.username + '@puter.com';
-            document.getElementById('userInit').textContent = user.username[0].toUpperCase();
+            const uname = user.username || 'User';
+            document.getElementById('userName').textContent = uname;
+            document.getElementById('userEmail').textContent = user.email || uname + '@puter.com';
+            document.getElementById('userInit').textContent = uname[0].toUpperCase();
+            updateGreeting(uname);
         }
 
         async function handleLogin() {
@@ -542,6 +552,20 @@
             sidebar.style.width = isSidebarCollapsed ? '68px' : '260px';
             labels.forEach(l => l.style.display = isSidebarCollapsed ? 'none' : 'flex');
             logo.style.display = isSidebarCollapsed ? 'none' : 'block';
+        }
+
+        let isMobileSidebarOpen = false;
+        function toggleSidebarMobile() {
+            isMobileSidebarOpen = !isMobileSidebarOpen;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (isMobileSidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
         }
 
         function toggleUserMenu() {
@@ -849,10 +873,10 @@
             renderHistory();
         }
 
-        function updateGreeting() {
+        function updateGreeting(username = "User") {
             const hour = new Date().getHours();
             let g = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
-            document.getElementById('greetingText').textContent = `${g}, raj`;
+            document.getElementById('greetingText').textContent = `${g}, ${username}`;
         }
 
         function timeSince(date) {
