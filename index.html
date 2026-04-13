@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude AI Interface - Full Clone</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #212121;
+            color: #e3e3e3;
+        }
+
+        .font-serif {
+            font-family: 'Source Serif 4', serif;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 7px 12px;
+            border-radius: 8px;
+            transition: all 0.15s;
+            cursor: pointer;
+            font-size: 13px;
+            color: #b4b4b4;
+        }
+
+        .sidebar-item:hover {
+            background-color: #2f2f2f;
+            color: #ffffff;
+        }
+
+        .active-sidebar-item {
+            background-color: #2f2f2f;
+            color: #ffffff;
+        }
+
+        .chat-input-wrapper {
+            background-color: #212121;
+            border: 1px solid #3d3d3d;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .action-pill {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #3d3d3d;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #b4b4b4;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .action-pill:hover {
+            background-color: #2f2f2f;
+            border-color: #4d4d4d;
+            color: #fff;
+        }
+
+        .prose pre {
+            background-color: #1a1a1a !important;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #333;
+            overflow-x: auto;
+        }
+
+        .prose code {
+            font-family: 'Consolas', monospace;
+            background: #333;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        .prose p {
+            margin-bottom: 1rem;
+            line-height: 1.6;
+        }
+
+        .prose h1,
+        .prose h2,
+        .prose h3 {
+            font-family: 'Source Serif 4', serif;
+            font-weight: 600;
+            color: white;
+            margin-top: 1.5rem;
+        }
+
+        .custom-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .custom-scroll::-webkit-scrollbar-thumb {
+            background: #333;
+            border-radius: 10px;
+        }
+
+        .search-overlay {
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+        }
+
+        .search-modal {
+            background: #2f2f2f;
+            border: 1px solid #444;
+            border-radius: 12px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .card-style {
+            background: #171717;
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 1.5rem;
+            transition: border-color 0.2s;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-style:hover {
+            border-color: #555;
+        }
+
+        .card-preview {
+            background: #212121;
+            border-radius: 8px;
+            height: 120px;
+            margin-bottom: 12px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 10px;
+            color: #888;
+            overflow: hidden;
+            white-space: pre-wrap;
+        }
+
+        #loginScreen {
+            background-color: #171717;
+            z-index: 1000;
+        }
+
+        /* Menu */
+        .user-menu {
+            background: #2f2f2f;
+            border: 1px solid #444;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            bottom: 70px;
+            left: 12px;
+            width: 240px;
+            z-index: 50;
+        }
+
+        /* Message Pulse */
+        .dot-pulse {
+            position: relative;
+            left: -9999px;
+            width: 6px;
+            height: 6px;
+            border-radius: 5px;
+            background-color: #d97757;
+            color: #d97757;
+            box-shadow: 9999px 0 0 0 #d97757;
+            animation: dotPulse 1.5s infinite linear;
+        }
+
+        @keyframes dotPulse {
+            0% {
+                box-shadow: 9999px 0 0 -5px #d97757;
+            }
+
+            30% {
+                box-shadow: 9999px 0 0 2px #d97757;
+            }
+
+            60%,
+            100% {
+                box-shadow: 9999px 0 0 -5px #d97757;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex h-screen overflow-hidden">
+
+    <!-- Global Search Modal -->
+    <div id="searchOverlay" class="fixed inset-0 search-overlay hidden flex items-start justify-center pt-[15vh]">
+        <div class="search-modal overflow-hidden">
+            <div class="flex items-center p-4 border-b border-[#444]">
+                <i data-lucide="search" class="w-4 h-4 text-gray-400 mr-3"></i>
+                <input type="text" id="globalSearchInput" placeholder="Search chats and projects"
+                    class="flex-1 bg-transparent border-none outline-none text-[15px] text-white">
+                <button onclick="closeGlobalSearch()" class="text-gray-500 hover:text-white"><i data-lucide="x"
+                        class="w-4 h-4"></i></button>
+            </div>
+            <div id="globalSearchResults" class="max-h-[400px] overflow-y-auto custom-scroll p-2"></div>
+        </div>
+    </div>
+
+    <!-- Generic Modal -->
+    <div id="genericModal" class="hidden fixed inset-0 flex items-center justify-center search-overlay p-4 z-[3000]">
+        <div class="bg-[#2f2f2f] border border-[#444] rounded-xl w-full max-w-md p-6 shadow-2xl">
+            <h3 id="modalTitle" class="text-xl font-serif text-white mb-4">Create</h3>
+            <input type="text" id="modalInput1" placeholder="Title" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white mb-4 outline-none focus:border-[#d97757] transition-colors">
+            <textarea id="modalInput2" placeholder="Content (optional)" class="hidden w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white mb-4 outline-none focus:border-[#d97757] h-32 resize-none custom-scroll transition-colors"></textarea>
+            <div class="flex justify-end gap-3 mt-4">
+                <button onclick="closeModal()" class="px-5 py-2.5 rounded-lg text-gray-400 hover:text-white hover:bg-[#3d3d3d] transition-colors font-medium">Cancel</button>
+                <button id="modalSubmit" class="px-5 py-2.5 rounded-lg bg-[#d97757] hover:bg-[#c06548] text-white font-medium transition-colors cursor-pointer">Create</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Auth Logic Modals -->
+    <div id="loginScreen" class="hidden fixed inset-0 flex items-center justify-center p-6 z-[4000] bg-black/80 backdrop-blur-sm">
+        <div class="max-w-md w-full text-center bg-[#212121] p-10 rounded-3xl border border-[#333] shadow-2xl">
+            <div class="mb-8">
+                <h1 class="font-serif text-3xl text-white italic">Welcome back</h1>
+                <p class="text-gray-400 mt-2">Sign in to your Premium workspace.</p>
+            </div>
+            <input type="email" id="loginEmail" placeholder="Email" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757]">
+            <input type="password" id="loginPass" placeholder="Password" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757] mt-3">
+            <button onclick="performLogin()" id="loginBtn" class="w-full py-3.5 mt-6 bg-[#d97757] hover:bg-[#c06548] text-white font-semibold rounded-xl transition-all">
+                Sign In
+            </button>
+            <p id="loginErr" class="text-red-400 text-sm mt-3 hidden"></p>
+        </div>
+    </div>
+
+    <!-- Promo Code Required Modal -->
+    <div id="promoScreen" class="hidden fixed inset-0 flex items-center justify-center p-6 z-[4000] bg-black/80 backdrop-blur-sm">
+        <div class="max-w-md w-full text-center bg-[#212121] p-10 rounded-3xl border border-[#333] shadow-2xl">
+            <div class="mb-8">
+                <h1 class="font-serif text-3xl text-white italic">Active Plan Required</h1>
+                <p class="text-gray-400 mt-2">Your subscription has expired. Enter a promo code to unlock access.</p>
+            </div>
+            <input type="text" id="promoInput" placeholder="Enter Promo Code" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757]">
+            <button onclick="redeemPromo()" id="promoBtn" class="w-full py-3.5 mt-6 bg-[#d97757] hover:bg-[#c06548] text-white font-semibold rounded-xl transition-all">
+                Redeem Code
+            </button>
+            <p id="promoErr" class="text-red-400 text-sm mt-3 hidden"></p>
+        </div>
+    </div>
+
+    <!-- Login Screen bypass: Using Anonymous Access -->
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="mobileSidebarOverlay" onclick="toggleSidebarMobile()" class="fixed inset-0 bg-black/50 z-[1999] hidden md:hidden"></div>
+
+    <!-- Sidebar -->
+    <aside id="sidebar"
+        class="absolute md:relative z-[2000] w-[260px] bg-[#171717] flex flex-col h-full border-r border-[#262626] shrink-0 transition-all duration-300 -translate-x-full md:translate-x-0">
+        <div class="p-4 flex items-center justify-between">
+            <h1 id="sidebarLogo" class="font-serif text-[22px] text-white font-semibold tracking-tight">Claude</h1>
+            <button onclick="window.innerWidth < 768 ? toggleSidebarMobile() : toggleSidebar()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i
+                    data-lucide="panel-left" class="w-[18px] h-[18px]"></i></button>
+        </div>
+
+        <div class="px-2 flex flex-col gap-0.5">
+            <div onclick="startNewChat()" class="sidebar-item"><i data-lucide="plus" class="w-4 h-4"></i><span
+                    class="label">New chat</span></div>
+            <div onclick="openGlobalSearch()" class="sidebar-item"><i data-lucide="search" class="w-4 h-4"></i><span
+                    class="label">Search</span></div>
+            <div class="sidebar-item"><i data-lucide="settings-2" class="w-4 h-4"></i><span
+                    class="label">Customize</span></div>
+        </div>
+
+        <div class="px-2 mt-4 flex flex-col gap-0.5">
+            <div onclick="setView('search-page')" class="sidebar-item" id="nav-chats"><i data-lucide="message-square"
+                    class="w-4 h-4"></i><span class="label">Chats</span></div>
+            <div onclick="setView('projects')" class="sidebar-item" id="nav-projects"><i data-lucide="folder-kanban"
+                    class="w-4 h-4"></i><span class="label">Projects</span></div>
+            <div onclick="setView('artifacts')" class="sidebar-item" id="nav-artifacts"><i data-lucide="layers"
+                    class="w-4 h-4"></i><span class="label">Artifacts</span></div>
+        </div>
+
+        <div class="flex-1 overflow-y-auto custom-scroll px-2 mt-4">
+            <div class="label text-[11px] font-semibold text-gray-500 px-3 mb-2 uppercase tracking-wider">Recents</div>
+            <div id="sidebarHistory" class="space-y-0.5"></div>
+        </div>
+
+        <!-- User Profile Area -->
+        <div class="p-3 border-t border-[#262626] relative">
+            <div id="userMenu" class="user-menu absolute hidden flex flex-col py-1 text-gray-300">
+                <div class="px-3 py-2 text-[12px] text-gray-500 border-b border-[#444] mb-1" id="userEmail">
+                    Anonymous User</div>
+                <button class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
+                        data-lucide="settings" class="w-4 h-4"></i> Settings</button>
+                <button class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
+                        data-lucide="globe" class="w-4 h-4"></i> Language</button>
+                <button class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
+                        data-lucide="help-circle" class="w-4 h-4"></i> Get help</button>
+                <div class="border-t border-[#444] my-1"></div>
+                <button
+                    class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left font-medium text-[#e3e3e3]"><i
+                        data-lucide="info" class="w-4 h-4"></i> Learn more</button>
+                <div class="border-t border-[#444] my-1"></div>
+                <button onclick="handleLogout()"
+                    class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
+                        data-lucide="log-out" class="w-4 h-4"></i> Log out</button>
+            </div>
+
+            <div onclick="toggleUserMenu()"
+                class="flex items-center justify-between p-1 rounded-lg hover:bg-[#2f2f2f] cursor-pointer transition-colors">
+                <div class="flex items-center gap-2.5">
+                    <div id="userInit"
+                        class="w-8 h-8 rounded-full bg-[#d9d9d1] text-[#171717] flex items-center justify-center font-bold text-sm">
+                        U</div>
+                    <div class="flex flex-col label overflow-hidden">
+                        <span id="userName" class="text-[13px] font-medium text-white leading-tight truncate">User</span>
+                        <span class="text-[11px] text-[#d97757] leading-tight font-medium">Premium plan</span>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5 text-gray-500 label"><i data-lucide="chevrons-up-down"
+                        class="w-3 h-3"></i></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-[#212121]">
+
+        <!-- Mobile Header Bar -->
+        <div class="md:hidden flex items-center p-3 border-b border-[#333]">
+            <button onclick="toggleSidebarMobile()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i data-lucide="menu" class="w-5 h-5"></i></button>
+            <span class="ml-2 font-serif text-[18px] text-white">Claude</span>
+        </div>
+
+        <!-- View: Chat -->
+        <div id="view-chat" class="flex-1 flex flex-col h-full relative">
+            <div id="messageArea" class="flex-1 overflow-y-auto custom-scroll p-6 hidden">
+                <div id="messageContainer" class="max-w-3xl mx-auto space-y-8 pb-48"></div>
+            </div>
+            <div id="welcomeView" class="flex-1 flex flex-col items-center justify-center -mt-10">
+                <div
+                    class="mb-6 px-3 py-1 bg-[#2f2f2f] rounded-full text-[12px] font-medium text-gray-300 border border-[#3d3d3d]">
+                    Premium plan</div>
+                <div class="flex items-center gap-4 mb-10">
+                    <svg width="32" height="32" viewBox="0 0 100 100" fill="none" class="text-[#d97757]">
+                        <path
+                            d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z"
+                            fill="currentColor" />
+                    </svg>
+                    <h2 class="font-serif text-4xl text-white font-normal" id="greetingText">Good afternoon, User</h2>
+                </div>
+            </div>
+
+            <!-- Chat Input (Sticky at Bottom) -->
+            <div
+                class="absolute bottom-0 left-0 right-0 w-full flex flex-col items-center px-4 pb-4 z-10 bg-gradient-to-t from-[#212121] via-[#212121] to-transparent">
+                <div class="max-w-[720px] w-full">
+                    <div class="chat-input-wrapper p-4 pb-3 flex flex-col">
+                        <div id="imagePreviewContainer" class="hidden mb-2 relative max-w-[fit-content]">
+                            <div class="bg-white p-1 rounded-xl inline-block shadow-sm">
+                                <img id="imagePreview" src="" class="w-16 h-16 object-cover rounded-lg" />
+                            </div>
+                            <button onclick="removeImageAttachment()" class="absolute -top-2 -right-2 bg-[#212121] hover:bg-[#333] text-gray-400 hover:text-white rounded-full p-1 border border-[#444] transition-colors shadow">
+                                <i data-lucide="x" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                        <textarea id="chatInput"
+                            class="w-full bg-transparent border-none outline-none resize-none text-[16px] text-gray-200 placeholder-gray-500 min-h-[60px]"
+                            placeholder="How can I help you today?"></textarea>
+                        <div class="flex items-center justify-between mt-2">
+                            <div class="flex items-center">
+                                <input type="file" id="chatFileInput" class="hidden">
+                                <button onclick="document.getElementById('chatFileInput').click()" class="p-1.5 text-gray-500 hover:text-gray-300"><i data-lucide="plus"
+                                        class="w-5 h-5"></i></button>
+                            </div>
+                            <div class="flex items-center gap-3">
+                                <div class="relative flex items-center pr-2">
+                                    <span class="font-medium text-[13px] text-gray-400 select-none">Sonnet 4.6</span>
+                                </div>
+                                <button onclick="sendMessage()" id="sendBtn"
+                                    class="p-1 text-gray-500 hover:text-[#d97757] transition-colors"><i
+                                        data-lucide="circle-arrow-up" class="w-6 h-6"></i></button>
+                            </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="actionPills" class="flex flex-wrap items-center justify-center gap-2 mt-6">
+                        <button onclick="sendPrompt('Write')" class="action-pill"><i data-lucide="pen-line"
+                                class="w-4 h-4"></i> Write</button>
+                        <button onclick="sendPrompt('Learn')" class="action-pill"><i data-lucide="graduation-cap"
+                                class="w-4 h-4"></i> Learn</button>
+                        <button onclick="sendPrompt('Code')" class="action-pill"><i data-lucide="code-2"
+                                class="w-4 h-4"></i> Code</button>
+                        <button onclick="sendPrompt('Life stuff')" class="action-pill"><i data-lucide="coffee"
+                                class="w-4 h-4"></i> Life stuff</button>
+                        <button onclick="sendPrompt('Claude\'s choice')" class="action-pill"><i data-lucide="sparkles"
+                                class="w-4 h-4"></i> Claude's choice</button>
+                    </div>
+                    <div class="text-center mt-3">
+                        <p class="text-[11px] text-gray-500">Claude is AI and can make mistakes. Please double-check
+                            responses.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- View: Search Page -->
+        <div id="view-search-page" class="hidden flex-1 overflow-y-auto custom-scroll p-10">
+            <div class="max-w-4xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="text-3xl font-normal text-white">Chats</h2>
+                    <button onclick="startNewChat()"
+                        class="bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-200 transition-colors">New
+                        chat</button>
+                </div>
+                <div class="relative mb-8">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                    <input type="text" oninput="filterSearchPage(this.value)" placeholder="Search your chats..."
+                        class="w-full bg-transparent border border-[#444] rounded-lg py-3 pl-12 pr-4 outline-none focus:border-blue-500">
+                </div>
+                <div id="searchPageList" class="divide-y divide-[#333] border-t border-[#333]"></div>
+            </div>
+        </div>
+
+        <!-- View: Projects -->
+        <div id="view-projects" class="hidden flex-1 overflow-y-auto custom-scroll p-10">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-serif text-3xl text-white">Projects</h2>
+                    <button onclick="createNewProject()"
+                        class="bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-200">New
+                        project</button>
+                </div>
+                <div class="relative mb-12">
+                    <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500"></i>
+                    <input type="text" placeholder="Search projects..."
+                        class="w-full bg-transparent border border-[#444] rounded-lg py-3 pl-12 pr-4 outline-none focus:border-blue-500">
+                </div>
+
+                <!-- Empty State -->
+                <div id="projectsEmptyState" class="flex flex-col items-center justify-center py-20 opacity-80">
+                    <i data-lucide="layout-grid" class="w-16 h-16 text-gray-600 mb-4"></i>
+                    <p class="text-lg font-medium text-white mb-2">Looking to start a project?</p>
+                    <p class="text-gray-500 text-sm mb-6 text-center max-w-sm">Upload materials, set custom
+                        instructions, and organize conversations in one space.</p>
+                    <button onclick="createNewProject()"
+                        class="bg-transparent border border-[#444] px-6 py-2 rounded-lg hover:bg-[#2f2f2f]">New
+                        project</button>
+                </div>
+
+                <!-- Filled Grid -->
+                <div id="projectsGrid" class="hidden grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+
+        <!-- View: Artifacts -->
+        <div id="view-artifacts" class="hidden flex-1 overflow-y-auto custom-scroll p-10">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex justify-between items-center mb-8">
+                    <h2 class="font-serif text-3xl text-white">Artifacts</h2>
+                    <button onclick="createNewArtifact()"
+                        class="bg-white text-black px-4 py-2 rounded-lg font-medium hover:bg-gray-200">New
+                        artifact</button>
+                </div>
+                <div class="border-b border-[#333] mb-8">
+                    <button class="px-4 py-2 text-white border-b-2 border-white font-medium text-sm">Your
+                        artifacts</button>
+                </div>
+
+                <!-- Empty State -->
+                <div id="artifactsEmptyState" class="hidden flex-col items-center justify-center py-20 opacity-80">
+                    <i data-lucide="layers" class="w-16 h-16 text-gray-600 mb-4"></i>
+                    <p class="text-lg font-medium text-white mb-2">No artifacts yet.</p>
+                    <button onclick="createNewArtifact()"
+                        class="bg-transparent border border-[#444] px-6 py-2 mt-4 rounded-lg hover:bg-[#2f2f2f]">Create
+                        one</button>
+                </div>
+
+                <!-- Filled Grid -->
+                <div id="artifactsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let allChats = JSON.parse(localStorage.getItem('claude_history_final') || '[]');
+        let allArtifacts = JSON.parse(localStorage.getItem('claude_artifacts_final') || '[]');
+        let allProjects = JSON.parse(localStorage.getItem('claude_projects_final') || '[]');
+        let currentChatId = null;
+        let isSidebarCollapsed = false;
+
+        let supabaseClient = null;
+        let currentUser = null;
+
+        async function init() {
+            lucide.createIcons();
+            updateGreeting();
+            renderHistory();
+
+            const sbUrl = 'https://zbgljlughkavbzueopjx.supabase.co';
+            const sbKey = 'sb_publishable_otdTGesO-mgeHQuXHIVZcA_ZluiPs3b';
+            if (typeof supabase !== 'undefined') {
+                supabaseClient = supabase.createClient(sbUrl, sbKey);
+                const { data } = await supabaseClient.auth.getSession();
+                if (data.session) {
+                    await handlePostLogin(data.session.user);
+                } else {
+                    document.getElementById('loginScreen').classList.remove('hidden');
+                }
+            } else {
+                console.error("Supabase script failed to load. Check network.");
+            }
+        }
+
+        async function performLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const pass = document.getElementById('loginPass').value;
+            const err = document.getElementById('loginErr');
+            const btn = document.getElementById('loginBtn');
+            if(!email || !pass) return;
+
+            btn.textContent = "Authenticating..."; btn.disabled = true;
+            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+            if (error) {
+                err.textContent = error.message; err.classList.remove('hidden');
+                btn.textContent = "Sign In"; btn.disabled = false;
+            } else {
+                document.getElementById('loginScreen').classList.add('hidden');
+                await handlePostLogin(data.user);
+            }
+        }
+
+        async function handlePostLogin(user) {
+            currentUser = user;
+            document.getElementById('userName').textContent = user.email.split('@')[0];
+            document.getElementById('userEmail').textContent = user.email;
+            document.getElementById('userInit').textContent = user.email[0].toUpperCase();
+            
+            // Check promo status
+            const { data: profile } = await supabaseClient.from('profiles').select('plan_expiration').eq('id', user.id).single();
+            const now = new Date();
+            const expiry = profile?.plan_expiration ? new Date(profile.plan_expiration) : null;
+            
+            if (!expiry || expiry < now) {
+                document.getElementById('promoScreen').classList.remove('hidden');
+            }
+        }
+
+        async function redeemPromo() {
+            const code = document.getElementById('promoInput').value;
+            const err = document.getElementById('promoErr');
+            const btn = document.getElementById('promoBtn');
+            if(!code) return;
+
+            btn.textContent = "Verifying..."; btn.disabled = true;
+
+            // Find Code (Bypass secure updates natively via simple Select and client Update since policies handle it if customized)
+            const { data: promo } = await supabaseClient.from('promo_codes').select('*').eq('code', code).eq('is_used', false).single();
+            if (!promo) {
+                err.textContent = "Invalid or already used promo code."; err.classList.remove('hidden');
+                btn.textContent = "Redeem Code"; btn.disabled = false;
+                return;
+            }
+
+            // Calculate new expiry
+            const days = promo.duration_days;
+            const newExpiry = new Date();
+            newExpiry.setDate(newExpiry.getDate() + days);
+
+            // Update Promo
+            await supabaseClient.from('promo_codes').update({ is_used: true, used_by: currentUser.id }).eq('id', promo.id);
+            // Update Profile
+            await supabaseClient.from('profiles').update({ plan_expiration: newExpiry.toISOString() }).eq('id', currentUser.id);
+
+            document.getElementById('promoScreen').classList.add('hidden');
+            alert(`Successfully redeemed ${days} days!`);
+        }
+
+        function handleLogin() {
+            if(supabaseClient) document.getElementById('loginScreen').classList.remove('hidden');
+        }
+
+        function handleLogout() {
+            alert("Logout disabled in this open instance.");
+        }
+
+        function setView(view) {
+            const sections = ['chat', 'search-page', 'projects', 'artifacts'];
+            sections.forEach(s => document.getElementById(`view-${s}`).classList.add('hidden'));
+            document.getElementById(`view-${view}`).classList.remove('hidden');
+
+            ['chats', 'projects', 'artifacts'].forEach(n => document.getElementById(`nav-${n}`).classList.remove('active-sidebar-item'));
+            if (['search-page', 'projects', 'artifacts'].includes(view)) {
+                const id = view === 'search-page' ? 'chats' : view;
+                document.getElementById(`nav-${id}`).classList.add('active-sidebar-item');
+            }
+
+            if (view === 'search-page') renderSearchPage();
+            if (view === 'artifacts') renderArtifacts();
+            if (view === 'projects') renderProjects();
+        }
+
+        function toggleSidebar() {
+            isSidebarCollapsed = !isSidebarCollapsed;
+            const sidebar = document.getElementById('sidebar');
+            const labels = document.querySelectorAll('.label');
+            const logo = document.getElementById('sidebarLogo');
+            sidebar.style.width = isSidebarCollapsed ? '68px' : '260px';
+            labels.forEach(l => l.style.display = isSidebarCollapsed ? 'none' : 'flex');
+            logo.style.display = isSidebarCollapsed ? 'none' : 'block';
+        }
+
+        let isMobileSidebarOpen = false;
+        function toggleSidebarMobile() {
+            isMobileSidebarOpen = !isMobileSidebarOpen;
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('mobileSidebarOverlay');
+            if (isMobileSidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                overlay.classList.remove('hidden');
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('hidden');
+            }
+        }
+
+        function toggleUserMenu() {
+            document.getElementById('userMenu').classList.toggle('hidden');
+        }
+
+        function openGlobalSearch() {
+            document.getElementById('searchOverlay').classList.remove('hidden');
+            document.getElementById('globalSearchInput').focus();
+            renderGlobalSearchResults("");
+        }
+
+        function closeGlobalSearch() {
+            document.getElementById('searchOverlay').classList.add('hidden');
+        }
+
+        function getRelativeTime(timestamp) {
+            const diff = Date.now() - timestamp;
+            const hours = diff / (1000 * 60 * 60);
+            if (hours < 1) return "Past hour";
+            if (hours < 24) return "Today";
+            if (hours < 24 * 30) return "Past month";
+            return "Past year";
+        }
+
+        function renderGlobalSearchResults(query) {
+            const container = document.getElementById('globalSearchResults');
+            const filtered = allChats.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+            container.innerHTML = filtered.length > 0 ? filtered.map(c => `
+                <div onclick="loadChat(${c.id}); closeGlobalSearch();" class="flex items-center gap-3 p-3 hover:bg-[#3d3d3d] rounded-lg cursor-pointer group">
+                    <i data-lucide="message-square" class="w-4 h-4 text-gray-500"></i>
+                    <span class="text-sm text-gray-200 flex-1 truncate">${c.title}</span>
+                    <span class="text-[11px] text-gray-500">${getRelativeTime(c.id)}</span>
+                </div>
+            `).join('') : '<div class="p-4 text-center text-gray-500 text-sm">No results found</div>';
+            lucide.createIcons();
+        }
+
+        document.getElementById('globalSearchInput').oninput = (e) => renderGlobalSearchResults(e.target.value);
+
+        function startNewChat() {
+            currentChatId = null;
+            setView('chat');
+            document.getElementById('messageArea').classList.add('hidden');
+            document.getElementById('welcomeView').classList.remove('hidden');
+            document.getElementById('messageContainer').innerHTML = '';
+            document.getElementById('chatInput').value = '';
+            renderHistory();
+        }
+
+        async function sendMessage(text) {
+            const inputField = document.getElementById('chatInput');
+            const input = text || inputField.value.trim();
+            if (!input && !typeof attachedImageBase64 === 'string') return;
+            if (!input && !attachedImageBase64) return;
+
+            if (!currentChatId) {
+                currentChatId = Date.now();
+                allChats.unshift({ id: currentChatId, title: input || "Image Attachment", messages: [] });
+            }
+
+            setView('chat');
+            inputField.value = '';
+            document.getElementById('welcomeView').classList.add('hidden');
+            document.getElementById('messageArea').classList.remove('hidden');
+
+            const currentImage = typeof attachedImageBase64 !== 'undefined' ? attachedImageBase64 : null;
+            if (currentImage) removeImageAttachment();
+
+            const chat = allChats.find(c => c.id === currentChatId);
+            chat.messages.push({ role: 'user', content: input, image: currentImage });
+            renderMessages();
+
+            const aiMsg = { role: 'assistant', content: '' };
+            chat.messages.push(aiMsg);
+
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
+
+            try {
+                // Build structured array representation for Puter AI
+                const aiMessages = chat.messages.slice(0, -1).map(m => {
+                    let contentArr = [];
+                    if (m.image) contentArr.push({ type: "image_url", image_url: { url: m.image } });
+                    if (m.content) contentArr.push({ type: "text", text: m.content });
+                    return { role: m.role, content: contentArr };
+                });
+
+                const response = await fetch('/api/chat', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ messages: aiMessages })
+                });
+
+                if (!response.ok) throw new Error("HTTP " + response.status);
+
+                const reader = response.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let done = false;
+
+                while (!done) {
+                    const { value, done: readerDone } = await reader.read();
+                    done = readerDone;
+                    if (value) {
+                        const chunk = decoder.decode(value, { stream: true });
+                        const lines = chunk.split('\n');
+                        for (const line of lines) {
+                            if (line.trim().startsWith('data: ') && !line.includes('[DONE]')) {
+                                try {
+                                    const data = JSON.parse(line.trim().slice(6));
+                                    if (data.choices && data.choices[0] && data.choices[0].delta && data.choices[0].delta.content) {
+                                        aiMsg.content += data.choices[0].delta.content;
+                                    }
+                                } catch(e) {}
+                            }
+                        }
+                        
+                        if (aiMsg.content.match(/CODEBLOCK\d+/i)) {
+                            aiMsg.content = aiMsg.content.replace(/CODEBLOCK\d+/gi, '\n[Code block was removed by the API]\n');
+                        }
+                        renderMessages();
+                        const area = document.getElementById('messageArea');
+                        area.scrollTop = area.scrollHeight;
+                    }
+                }
+            } catch (err) {
+                console.error("AI Generation Error: ", err);
+                aiMsg.content = "Failed to connect to AI. Please check your connection or Puter session.";
+                renderMessages();
+            } finally {
+                sendBtn.disabled = false;
+                saveData();
+                renderHistory();
+            }
+        }
+
+        function sendPrompt(type) {
+            const prompts = {
+                'Write': "Help me write a professional email requesting a project update.",
+                'Learn': "Explain the core concepts of React hooks in 3 bullet points.",
+                'Code': "Show me a clean way to fetch data in JavaScript using async/await.",
+                'Life stuff': "What are some practical tips for better sleep hygiene?",
+                'Claude\'s choice': "Share a weird but true historical fact."
+            };
+            sendMessage(prompts[type]);
+        }
+
+        function renderMessages() {
+            const container = document.getElementById('messageContainer');
+            const chat = allChats.find(c => c.id === currentChatId);
+            if (!chat) return;
+
+            container.innerHTML = chat.messages.map((m) => `
+                <div class="flex gap-4 ${m.role === 'user' ? 'justify-end' : ''}">
+                    ${m.role === 'assistant' ? `
+                        <div class="w-8 h-8 rounded-full bg-[#3d3d3d] flex items-center justify-center shrink-0">
+                            <svg width="18" height="18" viewBox="0 0 100 100" fill="none" class="text-[#d97757]"><path d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z" fill="currentColor"/></svg>
+                        </div>
+                    ` : ''}
+                    <div class="prose max-w-full flex flex-col gap-3 ${m.role === 'user' ? 'bg-[#2f2f2f] text-white p-4 rounded-2xl max-w-[80%]' : 'text-gray-200 flex-1'}">
+                        ${m.image ? `<div class="bg-white p-1 rounded-xl inline-block w-[fit-content]"><img src="${m.image}" class="max-w-[200px] max-h-[200px] object-cover rounded-lg" /></div>` : ''}
+                        ${m.content ? marked.parse(m.content) : (m.image ? '' : '<div class="py-2"><div class="dot-pulse"></div></div>')}
+                    </div>
+                </div>
+            `).join('');
+
+            document.querySelectorAll('pre code').forEach(hljs.highlightElement);
+        }
+
+        // --- Modal Logic ---
+        let modalResolve = null;
+        function openModal(title, needsContent = false) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('genericModal');
+                document.getElementById('modalTitle').textContent = title;
+                const input1 = document.getElementById('modalInput1');
+                const input2 = document.getElementById('modalInput2');
+                
+                input1.value = '';
+                input2.value = '';
+                
+                if (needsContent) {
+                    input2.classList.remove('hidden');
+                } else {
+                    input2.classList.add('hidden');
+                }
+                
+                modal.classList.remove('hidden');
+                input1.focus();
+                
+                modalResolve = resolve;
+                
+                const submitForm = () => {
+                    const val1 = input1.value.trim();
+                    const val2 = input2.value.trim();
+                    if (val1) {
+                        closeModal();
+                        resolve({ title: val1, content: val2 });
+                    }
+                };
+
+                document.getElementById('modalSubmit').onclick = submitForm;
+                input1.onkeydown = (e) => { if (e.key === 'Enter' && !needsContent) submitForm(); };
+            });
+        }
+        
+        function closeModal() {
+            document.getElementById('genericModal').classList.add('hidden');
+            if (modalResolve) modalResolve(null);
+            modalResolve = null;
+        }
+
+        // --- Artifacts Logic ---
+        async function createNewArtifact() {
+            const result = await openModal("Create New Artifact", true);
+            if (!result || !result.title) return;
+            allArtifacts.unshift({ id: Date.now(), title: result.title, content: result.content || "Empty", date: new Date().toLocaleDateString() });
+            saveData();
+            renderArtifacts();
+        }
+
+        function renderArtifacts() {
+            const grid = document.getElementById('artifactsGrid');
+            const empty = document.getElementById('artifactsEmptyState');
+
+            if (allArtifacts.length === 0) {
+                grid.classList.add('hidden');
+                empty.classList.replace('hidden', 'flex');
+            } else {
+                empty.classList.replace('flex', 'hidden');
+                grid.classList.remove('hidden');
+                grid.innerHTML = allArtifacts.map(art => `
+                    <div class="card-style group">
+                        <div class="card-preview">${art.content.substring(0, 150)}</div>
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1 overflow-hidden">
+                                <h3 class="text-white font-medium text-[15px] truncate">${art.title}</h3>
+                                <p class="text-gray-500 text-[12px] mt-1">Edited ${art.date}</p>
+                            </div>
+                            <button onclick="deleteArtifact(event, ${art.id})" class="opacity-0 group-hover:opacity-100 p-1 text-gray-500 hover:text-red-400 transition-all"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        }
+
+        function deleteArtifact(e, id) { e.stopPropagation(); allArtifacts = allArtifacts.filter(a => a.id !== id); saveData(); renderArtifacts(); }
+
+        // --- Projects Logic ---
+        async function createNewProject() {
+            const result = await openModal("Create New Project", false);
+            if (!result || !result.title) return;
+            allProjects.unshift({ id: Date.now(), name: result.title, date: new Date().toLocaleDateString() });
+            saveData();
+            renderProjects();
+        }
+
+        function renderProjects() {
+            const grid = document.getElementById('projectsGrid');
+            const empty = document.getElementById('projectsEmptyState');
+
+            if (allProjects.length === 0) {
+                grid.classList.add('hidden');
+                empty.classList.replace('hidden', 'flex');
+            } else {
+                empty.classList.replace('flex', 'hidden');
+                grid.classList.remove('hidden');
+                grid.innerHTML = allProjects.map(proj => `
+                    <div class="card-style group items-center justify-center py-10">
+                        <i data-lucide="folder-kanban" class="w-10 h-10 text-gray-500 mb-3"></i>
+                        <h3 class="text-white font-medium text-[16px] truncate max-w-[90%]">${proj.name}</h3>
+                        <p class="text-gray-500 text-[12px] mt-1">Created ${proj.date}</p>
+                        <div class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
+                             <button onclick="deleteProject(event, ${proj.id})" class="text-xs text-red-400 hover:text-red-300">Delete Project</button>
+                        </div>
+                    </div>
+                `).join('');
+                lucide.createIcons();
+            }
+        }
+
+        function deleteProject(e, id) { e.stopPropagation(); allProjects = allProjects.filter(p => p.id !== id); saveData(); renderProjects(); }
+
+        // --- History & Search ---
+        function renderHistory() {
+            const container = document.getElementById('sidebarHistory');
+            container.innerHTML = allChats.slice(0, 8).map(c => `
+                <div onclick="loadChat(${c.id})" class="sidebar-item ${c.id === currentChatId ? 'active-sidebar-item' : ''} group">
+                    <span class="truncate flex-1">${c.title}</span>
+                </div>
+            `).join('');
+        }
+
+        function renderSearchPage(query = "") {
+            const container = document.getElementById('searchPageList');
+            const filtered = allChats.filter(c => c.title.toLowerCase().includes(query.toLowerCase()));
+            container.innerHTML = filtered.map(c => `
+                <div onclick="loadChat(${c.id})" class="flex items-center py-4 hover:bg-[#2a2a2a] px-2 cursor-pointer transition-colors group border-b border-[#333]">
+                    <div class="flex-1">
+                        <div class="text-white font-medium mb-1">${c.title}</div>
+                        <div class="text-[12px] text-gray-500">Last message ${timeSince(c.id)} ago</div>
+                    </div>
+                    <button onclick="deleteChat(event, ${c.id})" class="opacity-0 group-hover:opacity-100 p-2 hover:bg-[#3d3d3d] rounded text-gray-500"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function filterSearchPage(val) { renderSearchPage(val); }
+
+        function loadChat(id) {
+            currentChatId = id;
+            setView('chat');
+            document.getElementById('welcomeView').classList.add('hidden');
+            document.getElementById('messageArea').classList.remove('hidden');
+            renderMessages();
+            renderHistory();
+        }
+
+        function deleteChat(e, id) {
+            e.stopPropagation();
+            allChats = allChats.filter(c => c.id !== id);
+            if (currentChatId === id) startNewChat();
+            saveData();
+            if (!document.getElementById('view-search-page').classList.contains('hidden')) renderSearchPage();
+            renderHistory();
+        }
+
+        function updateGreeting(username = "User") {
+            const hour = new Date().getHours();
+            let g = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+            document.getElementById('greetingText').textContent = `${g}, ${username}`;
+        }
+
+        function timeSince(date) {
+            const seconds = Math.floor((new Date() - date) / 1000);
+            if (seconds < 60) return "seconds";
+            let interval = seconds / 3600;
+            if (interval > 1) return Math.floor(interval) + " hours";
+            interval = seconds / 60;
+            if (interval > 1) return Math.floor(interval) + " minutes";
+            return "seconds";
+        }
+
+        function saveData() {
+            localStorage.setItem('claude_history_final', JSON.stringify(allChats));
+            localStorage.setItem('claude_artifacts_final', JSON.stringify(allArtifacts));
+            localStorage.setItem('claude_projects_final', JSON.stringify(allProjects));
+        }
+
+        document.getElementById('chatInput').onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); }
+        };
+
+        // --- File Upload Logic ---
+        let attachedImageBase64 = null;
+        
+        document.getElementById('chatFileInput').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+
+            if (file.type.startsWith('image/')) {
+                reader.onload = (ev) => {
+                    attachedImageBase64 = ev.target.result;
+                    document.getElementById('imagePreview').src = attachedImageBase64;
+                    document.getElementById('imagePreviewContainer').classList.remove('hidden');
+                    
+                    const chatInput = document.getElementById('chatInput');
+                    chatInput.placeholder = "Type / for skills";
+                    chatInput.focus();
+                    e.target.value = '';
+                };
+                reader.readAsDataURL(file);
+            } else {
+                reader.onload = (ev) => {
+                    const content = ev.target.result;
+                    const ext = file.name.split('.').pop();
+                    const msg = `[Attached File: ${file.name}]\n\`\`\`${ext}\n${content}\n\`\`\`\n`;
+                    const chatInput = document.getElementById('chatInput');
+                    chatInput.value = chatInput.value + (chatInput.value ? '\n\n' : '') + msg;
+                    chatInput.focus();
+                    e.target.value = '';
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        function removeImageAttachment() {
+            attachedImageBase64 = null;
+            document.getElementById('imagePreviewContainer').classList.add('hidden');
+            document.getElementById('imagePreview').src = '';
+            document.getElementById('chatInput').placeholder = "How can I help you today?";
+        }
+
+        init();
+    </script>
+</body>
+
+</html>

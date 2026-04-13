@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Claude Clone - Admin Panel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { background-color: #1a1a1a; color: #e3e3e3; font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen">
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="w-full max-w-sm p-8 bg-[#212121] rounded-2xl shadow-2xl border border-[#333]">
+        <h2 class="text-2xl font-semibold mb-6 flex items-center gap-2 text-white">
+            <i data-lucide="shield-check" class="text-[#d97757]"></i> Admin Access
+        </h2>
+        <input type="password" id="adminPass" placeholder="Enter Admin Password" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white mb-4 outline-none focus:border-[#d97757] transition-colors">
+        <button onclick="login()" class="w-full bg-[#d97757] hover:bg-[#c06548] text-white font-medium py-3 rounded-xl transition-colors">Authenticate</button>
+        <p id="loginError" class="text-red-400 text-sm mt-3 hidden">Incorrect password.</p>
+    </div>
+
+    <!-- Dashboard -->
+    <div id="dashboard" class="hidden w-full max-w-5xl p-8 h-screen overflow-y-auto">
+        <div class="flex justify-between items-center mb-8">
+            <h1 class="text-3xl font-bold flex items-center gap-3 text-white">
+                <i data-lucide="server-cog" class="w-8 h-8 text-[#d97757]"></i> System Dashboard
+            </h1>
+            <button onclick="logout()" class="text-gray-400 hover:text-white flex items-center gap-2"><i data-lucide="log-out" class="w-4 h-4"></i> Logout</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- API Keys Management -->
+            <div class="bg-[#212121] p-6 rounded-2xl border border-[#333]">
+                <h3 class="text-xl font-medium mb-4 flex items-center gap-2 text-white"><i data-lucide="key" class="w-5 h-5 text-yellow-500"></i> OpenRouter API Keys</h3>
+                <p class="text-sm text-gray-400 mb-4">Keys are managed seamlessly via backend Round-Robin.</p>
+                <div class="flex gap-2 mb-4">
+                    <input type="text" id="newApiKey" placeholder="sk-or-v1-..." class="flex-1 bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white outline-none focus:border-yellow-500">
+                    <button onclick="addApiKey()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-4 py-2 rounded-lg transition-colors">Add</button>
+                </div>
+                <div id="apiKeysList" class="space-y-2 max-h-48 overflow-y-auto pr-2">
+                    <!-- Keys injected here -->
+                </div>
+            </div>
+
+            <!-- Supabase Config -->
+            <div class="bg-[#212121] p-6 rounded-2xl border border-[#333]">
+                <h3 class="text-xl font-medium mb-4 flex items-center gap-2 text-white"><i data-lucide="database" class="w-5 h-5 text-green-500"></i> Supabase Setup</h3>
+                <p class="text-sm text-gray-400 mb-4">Connected securely via Hardcoded Credentials.</p>
+                <input type="text" id="sbUrl" value="https://zbgljlughkavbzueopjx.supabase.co" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white mb-3 outline-none" disabled>
+                <input type="password" id="sbAnon" placeholder="Supabase Service Role Key (for User Generation)" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white mb-4 outline-none focus:border-green-500">
+                <button onclick="initSupabase()" class="w-full bg-green-600 hover:bg-green-700 text-white font-medium py-2 rounded-lg transition-colors">Connect Service Role</button>
+                <p id="sbStatus" class="text-sm text-green-400 mt-2 hidden">Service Role Verified!</p>
+            </div>
+
+            <!-- Account Generator -->
+            <div class="bg-[#212121] p-6 rounded-2xl border border-[#333]">
+                <h3 class="text-xl font-medium mb-4 flex items-center gap-2 text-white"><i data-lucide="users" class="w-5 h-5 text-blue-500"></i> Generate Account</h3>
+                <div class="space-y-3">
+                    <input type="email" id="accEmail" placeholder="User Email" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500">
+                    <input type="password" id="accPass" placeholder="Temporary Password" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white outline-none focus:border-blue-500">
+                    <button onclick="createAccount()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 rounded-lg transition-colors">Create User in Supabase</button>
+                    <p id="accStatus" class="text-sm mt-2"></p>
+                </div>
+            </div>
+
+             <!-- Promo Codes -->
+             <div class="bg-[#212121] p-6 rounded-2xl border border-[#333]">
+                <h3 class="text-xl font-medium mb-4 flex items-center gap-2 text-white"><i data-lucide="ticket" class="w-5 h-5 text-purple-500"></i> Generate Promo Code</h3>
+                <div class="space-y-3">
+                    <input type="text" id="promoCodeStr" placeholder="e.g. SUMMER30" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white outline-none focus:border-purple-500">
+                    <select id="promoDuration" class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white outline-none focus:border-purple-500">
+                        <option value="30">30 Days Plan</option>
+                        <option value="180">6 Months Plan (180 days)</option>
+                        <option value="365">1 Year Plan (365 days)</option>
+                    </select>
+                    <button onclick="createPromo()" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 rounded-lg transition-colors">Generate Code</button>
+                    <p id="promoStatus" class="text-sm mt-2"></p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+        let currentPass = '';
+        let supabaseClient = null;
+
+        function login() {
+            const val = document.getElementById('adminPass').value;
+            if (val === 'Lolo@990') {
+                currentPass = val;
+                document.getElementById('loginScreen').classList.add('hidden');
+                document.getElementById('dashboard').classList.remove('hidden');
+                document.body.classList.remove('items-center', 'justify-center');
+                fetchKeys();
+            } else {
+                document.getElementById('loginError').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            window.location.reload();
+        }
+
+        // Base Supabase client with Anon Key for fetching/inserting API Keys and Promo Codes
+        const baseClient = supabase.createClient('https://zbgljlughkavbzueopjx.supabase.co', 'sb_publishable_otdTGesO-mgeHQuXHIVZcA_ZluiPs3b');
+
+        async function fetchKeys() {
+            try {
+                const { data, error } = await baseClient.from('api_keys').select('key');
+                if (error) throw error;
+                const list = document.getElementById('apiKeysList');
+                list.innerHTML = '';
+                if(data) {
+                    data.forEach(row => {
+                        list.innerHTML += `<div class="bg-[#1a1a1a] p-2 rounded border border-[#333] text-gray-300 text-xs truncate">${row.key}</div>`;
+                    });
+                }
+            } catch (err) { console.error(err); }
+        }
+
+        async function addApiKey() {
+            const val = document.getElementById('newApiKey').value;
+            if(!val) return;
+            try {
+                const { error } = await baseClient.from('api_keys').insert([{ key: val.trim() }]);
+                if (error) throw error;
+                document.getElementById('newApiKey').value = '';
+                fetchKeys();
+            } catch (err) { alert("Failed to add key to Supabase. Check RLS policies."); }
+        }
+
+        function initSupabase() {
+            const url = 'https://zbgljlughkavbzueopjx.supabase.co';
+            const key = document.getElementById('sbAnon').value;
+            if(!key) { alert("Please provide Service Role Key for generating users"); return; }
+            supabaseClient = supabase.createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
+            document.getElementById('sbStatus').classList.remove('hidden');
+            localStorage.setItem('admin_sb_key', key);
+        }
+
+        if(localStorage.getItem('admin_sb_key')) {
+            document.getElementById('sbAnon').value = localStorage.getItem('admin_sb_key');
+            initSupabase();
+        }
+
+        async function createAccount() {
+            if(!supabaseClient) return alert("Connect Supabase first!");
+            const email = document.getElementById('accEmail').value;
+            const pass = document.getElementById('accPass').value;
+            const stat = document.getElementById('accStatus');
+            stat.textContent = "Creating..."; stat.className = "text-yellow-400 text-sm mt-2";
+            
+            // Requires Service Role Key to bypass email confirmation seamlessly
+            const { data, error } = await supabaseClient.auth.admin.createUser({
+                email: email,
+                password: pass,
+                email_confirm: true
+            });
+
+            if (error) {
+                stat.textContent = "Error: " + error.message; stat.className = "text-red-400 text-sm mt-2";
+            } else {
+                stat.textContent = "User created successfully! ID: " + data.user.id; stat.className = "text-green-400 text-sm mt-2";
+                document.getElementById('accEmail').value = '';
+                document.getElementById('accPass').value = '';
+            }
+        }
+
+        async function createPromo() {
+            if(!supabaseClient) return alert("Connect Supabase first!");
+            const code = document.getElementById('promoCodeStr').value;
+            const days = parseInt(document.getElementById('promoDuration').value);
+            const stat = document.getElementById('promoStatus');
+            stat.textContent = "Generating..."; stat.className = "text-yellow-400 text-sm mt-2";
+
+            const { data, error } = await baseClient
+                .from('promo_codes')
+                .insert([{ code: code, duration_days: days }]);
+
+            if (error) {
+                stat.textContent = "Error: " + error.message; stat.className = "text-red-400 text-sm mt-2";
+            } else {
+                stat.textContent = `Promo Code ${code} created for ${days} days!`; stat.className = "text-green-400 text-sm mt-2";
+                document.getElementById('promoCodeStr').value = '';
+            }
+        }
+
+        // Handle Enter key for login
+        document.getElementById('adminPass').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') login();
+        });
+    </script>
+</body>
+</html>
