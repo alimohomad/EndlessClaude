@@ -35,57 +35,124 @@
 
         .sidebar {
             width: 260px;
-            background-color: #0A0A0A;
+            background-color: #171717;
             display: flex;
             flex-direction: column;
-            padding: 16px;
-            border-right: 1px solid #1F1F1F;
+            padding: 0;
+            border-right: 1px solid #2A2A2A;
             overflow-y: auto;
         }
 
+        .sidebar-top {
+            padding: 12px;
+            border-bottom: 1px solid #2A2A2A;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+        }
+
+        .brand-text {
+            font-size: 20px;
+            font-weight: 400;
+            color: #FFFFFF;
+            font-family: 'Charter', Georgia, 'Times New Roman', serif;
+        }
+
+        .sidebar-nav {
+            padding: 8px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            margin-bottom: 2px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            color: #B3B3B3;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .nav-item i {
+            width: 18px;
+            height: 18px;
+        }
+
+        .sidebar-section {
+            padding: 16px 12px 8px;
+        }
+
+        .section-title {
+            font-size: 12px;
+            color: #666666;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            padding: 0 12px;
+        }
+
         .sidebar-header {
-            margin-bottom: 20px;
+            margin-bottom: 0;
         }
 
         .new-chat-btn {
             width: 100%;
             background: transparent;
-            border: 1px solid #333333;
+            border: none;
             color: #B3B3B3;
-            padding: 10px 16px;
+            padding: 10px 12px;
             border-radius: 8px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 400;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
         }
 
         .new-chat-btn:hover {
-            border-color: #555555;
-            color: #FFFFFF;
             background-color: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
+        }
+
+        .new-chat-btn i {
+            width: 18px;
+            height: 18px;
         }
 
         .chat-list {
             flex: 1;
             overflow-y: auto;
+            padding: 0 8px;
         }
 
         .chat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             padding: 10px 12px;
-            margin-bottom: 4px;
+            margin-bottom: 2px;
             border-radius: 8px;
             cursor: pointer;
             transition: all 0.2s;
             color: #B3B3B3;
             font-size: 14px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            position: relative;
         }
 
         .chat-item:hover {
@@ -93,9 +160,98 @@
             color: #FFFFFF;
         }
 
+        .chat-item:hover .chat-options {
+            display: block;
+        }
+
         .chat-item.active {
-            background-color: rgba(255, 122, 69, 0.15);
-            color: #FF7A45;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #FFFFFF;
+        }
+
+        .chat-title {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .chat-options {
+            display: none;
+            padding: 4px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .chat-options:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .sidebar-footer {
+            padding: 12px;
+            border-top: 1px solid #2A2A2A;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #E5E5E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #171717;
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-size: 14px;
+            color: #FFFFFF;
+            font-weight: 500;
+        }
+
+        .user-plan {
+            font-size: 12px;
+            color: #666666;
+        }
+
+        .footer-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .footer-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            background: transparent;
+            border: none;
+            color: #B3B3B3;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .footer-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: #FFFFFF;
         }
 
         /* Sidebar */
@@ -617,16 +773,67 @@
     <div class="container hidden" id="mainContainer">
         <!-- Sidebar -->
         <div class="sidebar">
-            <div class="sidebar-header">
-                <button class="new-chat-btn" onclick="startNewChat()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="12" y1="5" x2="12" y2="19"></line>
-                        <line x1="5" y1="12" x2="19" y2="12"></line>
-                    </svg>
-                    New chat
-                </button>
+            <div class="sidebar-top">
+                <div class="sidebar-brand">
+                    <span class="brand-text">Claude</span>
+                    <button class="footer-btn">
+                        <i data-lucide="panel-left-close"></i>
+                    </button>
+                </div>
             </div>
-            <div class="chat-list" id="chatList"></div>
+
+            <div class="sidebar-nav">
+                <div class="nav-item" onclick="startNewChat()">
+                    <i data-lucide="plus"></i>
+                    <span>New chat</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="search"></i>
+                    <span>Search</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="briefcase"></i>
+                    <span>Customize</span>
+                </div>
+            </div>
+
+            <div class="sidebar-section">
+                <div class="section-title">Recents</div>
+                <div class="chat-list" id="chatList"></div>
+            </div>
+
+            <div class="sidebar-nav" style="margin-top: auto;">
+                <div class="nav-item">
+                    <i data-lucide="message-circle"></i>
+                    <span>Chats</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="folder"></i>
+                    <span>Projects</span>
+                </div>
+                <div class="nav-item">
+                    <i data-lucide="package"></i>
+                    <span>Artifacts</span>
+                </div>
+            </div>
+
+            <div class="sidebar-footer">
+                <div class="user-profile">
+                    <div class="user-avatar">R</div>
+                    <div class="user-info">
+                        <div class="user-name">raj</div>
+                        <div class="user-plan">Free plan</div>
+                    </div>
+                </div>
+                <div class="footer-actions">
+                    <button class="footer-btn">
+                        <i data-lucide="download"></i>
+                    </button>
+                    <button class="footer-btn">
+                        <i data-lucide="arrow-up"></i>
+                    </button>
+                </div>
+            </div>
         </div>
 
         <!-- Main Content -->
@@ -772,10 +979,42 @@
             allChats.forEach(chat => {
                 const chatItem = document.createElement('div');
                 chatItem.className = `chat-item ${chat.id === currentChatId ? 'active' : ''}`;
-                chatItem.textContent = chat.title;
+                
+                const titleSpan = document.createElement('span');
+                titleSpan.className = 'chat-title';
+                titleSpan.textContent = chat.title;
+                
+                const optionsBtn = document.createElement('div');
+                optionsBtn.className = 'chat-options';
+                optionsBtn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"></circle><circle cx="12" cy="5" r="1"></circle><circle cx="12" cy="19" r="1"></circle></svg>';
+                optionsBtn.onclick = (e) => {
+                    e.stopPropagation();
+                    if (confirm('Delete this chat?')) {
+                        deleteChat(chat.id);
+                    }
+                };
+                
+                chatItem.appendChild(titleSpan);
+                chatItem.appendChild(optionsBtn);
                 chatItem.onclick = () => loadChat(chat.id);
                 chatList.appendChild(chatItem);
             });
+            
+            // Reinitialize Lucide icons
+            lucide.createIcons();
+        }
+
+        function deleteChat(chatId) {
+            allChats = allChats.filter(c => c.id !== chatId);
+            if (chatId === currentChatId) {
+                if (allChats.length > 0) {
+                    loadChat(allChats[allChats.length - 1].id);
+                } else {
+                    startNewChat();
+                }
+            }
+            saveChatsToStorage();
+            updateChatList();
         }
 
         function displayMessages(messages) {
