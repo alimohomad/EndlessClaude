@@ -1352,78 +1352,15 @@
         }
 
         function formatMessageContent(content) {
-            // Escape HTML
+            // Simple HTML escape
             const escapeHtml = (text) => {
-                return text
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             };
             
-            let formatted = content;
-            
-            // Process code blocks first (```language\ncode\n```)
-            const codeBlocks = [];
-            formatted = formatted.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-                const placeholder = `___CODEBLOCK_${codeBlocks.length}___`;
-                const language = lang || 'code';
-                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                codeBlocks.push(`
-                    <pre>
-                        <div class="code-header">
-                            <span class="code-language">${language}</span>
-                            <button class="copy-button" onclick="copyCode('${codeId}')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <code id="${codeId}">${escapeHtml(code.trim())}</code>
-                    </pre>
-                `);
-                return placeholder;
-            });
-            
-            // Process inline code (`code`)
-            const inlineCodes = [];
-            formatted = formatted.replace(/`([^`]+)`/g, (match, code) => {
-                const placeholder = `___INLINECODE_${inlineCodes.length}___`;
-                inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
-                return placeholder;
-            });
-            
-            // Escape remaining HTML
-            formatted = escapeHtml(formatted);
-            
-            // Process markdown formatting
-            // Bold (**text** or __text__)
-            formatted = formatted.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-            formatted = formatted.replace(/__(.+?)__/g, '<strong>$1</strong>');
-            
-            // Italic (*text* or _text_) - but not ** or __
-            formatted = formatted.replace(/\*([^\*]+?)\*/g, '<em>$1</em>');
-            formatted = formatted.replace(/_([^_]+?)_/g, '<em>$1</em>');
-            
-            // Headers (## text)
-            formatted = formatted.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-            formatted = formatted.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-            formatted = formatted.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-            
-            // Restore inline code
-            inlineCodes.forEach((code, index) => {
-                formatted = formatted.replace(`___INLINECODE_${index}___`, code);
-            });
-            
-            // Restore code blocks
-            codeBlocks.forEach((block, index) => {
-                formatted = formatted.replace(`___CODEBLOCK_${index}___`, block);
-            });
-            
             // Convert line breaks to <br>
-            formatted = formatted.replace(/\n/g, '<br>');
+            let formatted = content.replace(/\n/g, '<br>');
             
             return formatted;
         }
@@ -1508,7 +1445,7 @@
             showLoading();
 
             try {
-                // Call Puter AI with Claude Sonnet - using stream like the old working code
+                // Call Puter AI with Claude Sonnet
                 const response = await puter.ai.chat(message, {
                     model: 'claude-sonnet',
                     stream: true
@@ -1519,18 +1456,21 @@
 
                 // Stream the response - properly handle the response format
                 for await (const part of response) {
+                    console.log('Part received:', part); // Debug each part
+                    
                     // Handle different response formats
                     if (typeof part === 'string') {
                         fullResponse += part;
-                    } else if (part?.text) {
-                        fullResponse += part.text;
                     } else if (part?.type === 'text' && part?.text) {
+                        fullResponse += part.text;
+                    } else if (part?.text) {
                         fullResponse += part.text;
                     }
                 }
 
                 // Debug: log what we received
-                console.log('Final response:', fullResponse);
+                console.log('Full concatenated response:', fullResponse);
+                console.log('Contains code blocks?', fullResponse.includes('```'));
 
                 addMessage(fullResponse, false);
             } catch (error) {
