@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AntClaude</title>
+    <title>Claude AI Interface - Full Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -288,7 +288,7 @@
     <aside id="sidebar"
         class="absolute md:relative z-[2000] w-[260px] bg-[#171717] flex flex-col h-full border-r border-[#262626] shrink-0 transition-all duration-300 -translate-x-full md:translate-x-0">
         <div class="p-4 flex items-center justify-between">
-            <h1 id="sidebarLogo" class="font-serif text-[22px] text-white font-semibold tracking-tight">AntClaude</h1>
+            <h1 id="sidebarLogo" class="font-serif text-[22px] text-white font-semibold tracking-tight">Claude</h1>
             <button onclick="window.innerWidth < 768 ? toggleSidebarMobile() : toggleSidebar()"
                 class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i data-lucide="panel-left"
                     class="w-[18px] h-[18px]"></i></button>
@@ -363,7 +363,7 @@
         <div class="md:hidden flex items-center p-3 border-b border-[#333]">
             <button onclick="toggleSidebarMobile()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg text-gray-400"><i
                     data-lucide="menu" class="w-5 h-5"></i></button>
-            <span class="ml-2 font-serif text-[18px] text-white">AntClaude</span>
+            <span class="ml-2 font-serif text-[18px] text-white">Claude</span>
         </div>
 
         <!-- View: Chat -->
@@ -381,7 +381,7 @@
                             d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z"
                             fill="currentColor" />
                     </svg>
-                    <h2 class="font-serif text-4xl text-white font-normal" id="greetingText">Good afternoon, User (reasoning enabled)</h2>
+                    <h2 class="font-serif text-4xl text-white font-normal" id="greetingText">Good afternoon, User</h2>
                 </div>
             </div>
 
@@ -429,11 +429,11 @@
                             class="w-4 h-4"></i> Code</button>
                     <button onclick="sendPrompt('Life stuff')" class="action-pill"><i data-lucide="coffee"
                             class="w-4 h-4"></i> Life stuff</button>
-                    <button onclick="sendPrompt('AntClaude\'s choice')" class="action-pill"><i data-lucide="sparkles"
-                            class="w-4 h-4"></i> AntClaude's choice</button>
+                    <button onclick="sendPrompt('Claude\'s choice')" class="action-pill"><i data-lucide="sparkles"
+                            class="w-4 h-4"></i> Claude's choice</button>
                 </div>
                 <div class="text-center mt-3">
-                    <p class="text-[11px] text-gray-500">AntClaude is AI and can make mistakes. Please double-check
+                    <p class="text-[11px] text-gray-500">Claude is AI and can make mistakes. Please double-check
                         responses.</p>
                 </div>
             </div>
@@ -519,9 +519,9 @@
     </main>
 
     <script>
-        let allChats = JSON.parse(localStorage.getItem('Claude_history_final') || '[]');
-        let allArtifacts = JSON.parse(localStorage.getItem('Claude_artifacts_final') || '[]');
-        let allProjects = JSON.parse(localStorage.getItem('Claude_projects_final') || '[]');
+        let allChats = JSON.parse(localStorage.getItem('claude_history_final') || '[]');
+        let allArtifacts = JSON.parse(localStorage.getItem('claude_artifacts_final') || '[]');
+        let allProjects = JSON.parse(localStorage.getItem('claude_projects_final') || '[]');
         let currentChatId = null;
         let isSidebarCollapsed = false;
 
@@ -735,6 +735,7 @@
 
             const aiMsg = { role: 'assistant', content: '', reasoning: '' };
             chat.messages.push(aiMsg);
+            renderMessages(); // Render instantly so user sees the thinking box immediately
 
             const sendBtn = document.getElementById('sendBtn');
             sendBtn.disabled = true;
@@ -815,7 +816,7 @@
                 'Learn': "Explain the core concepts of React hooks in 3 bullet points.",
                 'Code': "Show me a clean way to fetch data in JavaScript using async/await.",
                 'Life stuff': "What are some practical tips for better sleep hygiene?",
-                'AntClaude\'s choice': "Share a weird but true historical fact."
+                'Claude\'s choice': "Share a weird but true historical fact."
             };
             sendMessage(prompts[type]);
         }
@@ -839,7 +840,7 @@
                             <div class="bg-[#3d332d] border-l-2 border-[#d97757] p-4 rounded-r-xl text-[#d9a08b] text-sm italic mb-2 animate-in fade-in duration-300">
                                 <div class="flex items-center gap-2 mb-1 opacity-80">
                                     <i data-lucide="brain" class="w-4 h-4 ${!m.content ? 'animate-pulse' : ''}"></i>
-                                    <span class="font-bold uppercase tracking-wider text-[10px]">${m.content ? 'Thought process complete' : 'AntClaude is thinking...'}</span>
+                                    <span class="font-bold uppercase tracking-wider text-[10px]">${m.content ? 'Thought process complete' : 'Claude is thinking...'}</span>
                                 </div>
                                 ${(!m.content && !m.reasoning) ? '<div class="text-[11px] opacity-50">Analyzing request...</div>' : ''}
                                 ${m.reasoning && !m.content ? '<div class="text-[11px] opacity-50">Structuring response...</div>' : ''}
@@ -1033,9 +1034,9 @@
         }
 
         function saveData() {
-            localStorage.setItem('Claude_history_final', JSON.stringify(allChats));
-            localStorage.setItem('Claude_artifacts_final', JSON.stringify(allArtifacts));
-            localStorage.setItem('Claude_projects_final', JSON.stringify(allProjects));
+            localStorage.setItem('claude_history_final', JSON.stringify(allChats));
+            localStorage.setItem('claude_artifacts_final', JSON.stringify(allArtifacts));
+            localStorage.setItem('claude_projects_final', JSON.stringify(allProjects));
         }
 
         document.getElementById('chatInput').onkeydown = (e) => {
