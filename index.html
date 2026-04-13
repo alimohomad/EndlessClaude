@@ -497,6 +497,51 @@
             max-width: 100%;
         }
 
+        /* Hide scrollbars */
+        .chat-container::-webkit-scrollbar,
+        .sidebar-section::-webkit-scrollbar,
+        .chat-list::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .chat-container,
+        .sidebar-section,
+        .chat-list {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* Code blocks */
+        .bubble pre {
+            background-color: #1E1E1E;
+            border: 1px solid #2A2A2A;
+            border-radius: 8px;
+            padding: 16px;
+            overflow-x: auto;
+            margin: 8px 0;
+        }
+
+        .bubble code {
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            color: #E5E5E5;
+        }
+
+        .bubble pre code {
+            display: block;
+            white-space: pre;
+        }
+
+        .bubble :not(pre) > code {
+            background-color: #2A2A2A;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
         /* Input Container */
         .input-container {
             position: fixed;
@@ -1237,11 +1282,39 @@
             
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
-            bubble.textContent = content;
+            
+            // Format content with code blocks
+            const formattedContent = formatMessageContent(content);
+            bubble.innerHTML = formattedContent;
+            
             messageDiv.appendChild(bubble);
             
             messagesContainer.appendChild(messageDiv);
             messagesContainer.parentElement.scrollTop = messagesContainer.parentElement.scrollHeight;
+        }
+
+        function formatMessageContent(content) {
+            // Escape HTML
+            const escapeHtml = (text) => {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            };
+            
+            // Convert code blocks (```language\ncode\n```)
+            let formatted = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                return `<pre><code>${escapeHtml(code.trim())}</code></pre>`;
+            });
+            
+            // Convert inline code (`code`)
+            formatted = formatted.replace(/`([^`]+)`/g, (match, code) => {
+                return `<code>${escapeHtml(code)}</code>`;
+            });
+            
+            // Convert line breaks
+            formatted = formatted.replace(/\n/g, '<br>');
+            
+            return formatted;
         }
 
         function addMessage(content, isUser = false) {
