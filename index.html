@@ -1318,8 +1318,11 @@
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
             
+            // Clean up malformed responses first
+            const cleanedContent = isUser ? content : cleanAIResponse(content);
+            
             // Format content with code blocks
-            const formattedContent = formatMessageContent(content);
+            const formattedContent = formatMessageContent(cleanedContent);
             bubble.innerHTML = formattedContent;
             
             messageDiv.appendChild(bubble);
@@ -1392,6 +1395,14 @@
             formatted = formatted.replace(/\n/g, '<br>');
             
             return formatted;
+        }
+        
+        // Clean up malformed AI responses with code block placeholders
+        function cleanAIResponse(text) {
+            // Remove __CODEBLOCK0__, __CODEBLOCK1__, etc. patterns that appear as placeholders
+            // These appear when the AI response is malformed
+            return text.replace(/__(?:<[^>]+>)?CODE(?:<[^>]+>)?BLOCK(?:<[^>]+>)?\d+(?:<[^>]+>)?__/gi, 
+                '[Code example unavailable - please try asking again]');
         }
 
         function copyCode(codeId) {
@@ -1474,19 +1485,35 @@
             showLoading();
 
             try {
+                // Add instruction to format code properly
+                const enhancedMessage = message + "\n\n(Please format any code examples using markdown code blocks with triple backticks ```)";
+                
                 // Call Puter AI with Claude Sonnet
-                const response = await puter.ai.chat(message, {
+                const response = await puter.ai.chat(enhancedMessage, {
                     model: 'claude-sonnet',
-                    stream: true
+                    stream: false
                 });
 
                 removeLoading();
+                
+                // Get the full response text
                 let fullResponse = '';
-
-                // Stream the response
-                for await (const part of response) {
-                    fullResponse += part?.text || '';
+                if (typeof response === 'string') {
+                    fullResponse = response;
+                } else if (response.message) {
+                    fullResponse = response.message;
+                } else if (response.text) {
+                    fullResponse = response.text;
+                } else if (response.content) {
+                    fullResponse = response.content;
+                } else {
+                    // Try to extract text from response object
+                    fullResponse = JSON.stringify(response);
                 }
+
+                // Log the raw response for debugging
+                console.log('Raw AI Response:', response);
+                console.log('Processed Response:', fullResponse);
 
                 addMessage(fullResponse, false);
             } catch (error) {
