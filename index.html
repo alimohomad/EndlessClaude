@@ -1318,11 +1318,8 @@
             const bubble = document.createElement('div');
             bubble.className = 'bubble';
             
-            // Clean up malformed responses first
-            const cleanedContent = isUser ? content : cleanAIResponse(content);
-            
-            // Format content with code blocks
-            const formattedContent = formatMessageContent(cleanedContent);
+            // Simple formatting - just convert line breaks
+            const formattedContent = formatMessageContent(content);
             bubble.innerHTML = formattedContent;
             
             messageDiv.appendChild(bubble);
@@ -1332,77 +1329,17 @@
         }
 
         function formatMessageContent(content) {
-            // Escape HTML first, but preserve markdown markers
+            // Simple HTML escape
             const escapeHtml = (text) => {
-                return text
-                    .replace(/&/g, '&amp;')
-                    .replace(/</g, '&lt;')
-                    .replace(/>/g, '&gt;')
-                    .replace(/"/g, '&quot;')
-                    .replace(/'/g, '&#039;');
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
             };
             
-            // Store code blocks temporarily to avoid processing markdown inside them
-            const codeBlocks = [];
-            let formatted = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
-                const placeholder = `___CODE_BLOCK_${codeBlocks.length}___`;
-                const language = lang || 'code';
-                const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                codeBlocks.push(`
-                    <pre>
-                        <div class="code-header">
-                            <span class="code-language">${language}</span>
-                            <button class="copy-button" onclick="copyCode('${codeId}')">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                                </svg>
-                            </button>
-                        </div>
-                        <code id="${codeId}">${escapeHtml(code.trim())}</code>
-                    </pre>
-                `);
-                return placeholder;
-            });
-            
-            // Store inline code temporarily
-            const inlineCodes = [];
-            formatted = formatted.replace(/`([^`]+)`/g, (match, code) => {
-                const placeholder = `___INLINE_CODE_${inlineCodes.length}___`;
-                inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
-                return placeholder;
-            });
-            
-            // Now process markdown formatting on the remaining text
-            // Bold text (**text**)
-            formatted = formatted.replace(/\*\*([^\*\n]+?)\*\*/g, '<strong>$1</strong>');
-            
-            // Italic text (*text* or _text_)
-            formatted = formatted.replace(/\*([^\*\n]+?)\*/g, '<em>$1</em>');
-            formatted = formatted.replace(/_([^_\n]+?)_/g, '<em>$1</em>');
-            
-            // Restore inline code
-            inlineCodes.forEach((code, index) => {
-                formatted = formatted.replace(`___INLINE_CODE_${index}___`, code);
-            });
-            
-            // Restore code blocks
-            codeBlocks.forEach((block, index) => {
-                formatted = formatted.replace(`___CODE_BLOCK_${index}___`, block);
-            });
-            
-            // Convert line breaks
-            formatted = formatted.replace(/\n/g, '<br>');
+            // Convert line breaks to <br>
+            let formatted = content.replace(/\n/g, '<br>');
             
             return formatted;
-        }
-        
-        // Clean up malformed AI responses with code block placeholders
-        function cleanAIResponse(text) {
-            // Remove __CODEBLOCK0__, __CODEBLOCK1__, etc. patterns that appear as placeholders
-            // These appear when the AI response is malformed
-            return text.replace(/__(?:<[^>]+>)?CODE(?:<[^>]+>)?BLOCK(?:<[^>]+>)?\d+(?:<[^>]+>)?__/gi, 
-                '[Code example unavailable - please try asking again]');
         }
 
         function copyCode(codeId) {
