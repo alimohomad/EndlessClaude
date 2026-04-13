@@ -552,6 +552,9 @@
             border-radius: 4px;
             font-size: 12px;
             transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         .copy-button:hover {
@@ -579,6 +582,17 @@
             border-radius: 4px;
             font-size: 13px;
             white-space: normal;
+        }
+
+        /* Markdown formatting */
+        .bubble strong {
+            font-weight: 600;
+            color: #FFFFFF;
+        }
+
+        .bubble em {
+            font-style: italic;
+            color: #E5E5E5;
         }
 
         /* Input Container */
@@ -1343,6 +1357,13 @@
                     </pre>
                 `;
             });
+            
+            // Convert bold text (**text**)
+            formatted = formatted.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
+            
+            // Convert italic text (*text* or _text_)
+            formatted = formatted.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
+            formatted = formatted.replace(/_([^_]+)_/g, '<em>$1</em>');
             
             // Convert inline code (`code`)
             formatted = formatted.replace(/`([^`]+)`/g, (match, code) => {
