@@ -1331,18 +1331,23 @@
         }
 
         function formatMessageContent(content) {
-            // Escape HTML
+            // Escape HTML first, but preserve markdown markers
             const escapeHtml = (text) => {
-                const div = document.createElement('div');
-                div.textContent = text;
-                return div.innerHTML;
+                return text
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
             };
             
-            // Convert code blocks (```language\ncode\n```)
+            // Store code blocks temporarily to avoid processing markdown inside them
+            const codeBlocks = [];
             let formatted = content.replace(/```(\w+)?\n([\s\S]*?)```/g, (match, lang, code) => {
+                const placeholder = `___CODE_BLOCK_${codeBlocks.length}___`;
                 const language = lang || 'code';
                 const codeId = 'code-' + Math.random().toString(36).substr(2, 9);
-                return `
+                codeBlocks.push(`
                     <pre>
                         <div class="code-header">
                             <span class="code-language">${language}</span>
@@ -1355,19 +1360,34 @@
                         </div>
                         <code id="${codeId}">${escapeHtml(code.trim())}</code>
                     </pre>
-                `;
+                `);
+                return placeholder;
             });
             
-            // Convert bold text (**text**)
-            formatted = formatted.replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>');
-            
-            // Convert italic text (*text* or _text_)
-            formatted = formatted.replace(/\*([^\*]+)\*/g, '<em>$1</em>');
-            formatted = formatted.replace(/_([^_]+)_/g, '<em>$1</em>');
-            
-            // Convert inline code (`code`)
+            // Store inline code temporarily
+            const inlineCodes = [];
             formatted = formatted.replace(/`([^`]+)`/g, (match, code) => {
-                return `<code>${escapeHtml(code)}</code>`;
+                const placeholder = `___INLINE_CODE_${inlineCodes.length}___`;
+                inlineCodes.push(`<code>${escapeHtml(code)}</code>`);
+                return placeholder;
+            });
+            
+            // Now process markdown formatting on the remaining text
+            // Bold text (**text**)
+            formatted = formatted.replace(/\*\*([^\*\n]+?)\*\*/g, '<strong>$1</strong>');
+            
+            // Italic text (*text* or _text_)
+            formatted = formatted.replace(/\*([^\*\n]+?)\*/g, '<em>$1</em>');
+            formatted = formatted.replace(/_([^_\n]+?)_/g, '<em>$1</em>');
+            
+            // Restore inline code
+            inlineCodes.forEach((code, index) => {
+                formatted = formatted.replace(`___INLINE_CODE_${index}___`, code);
+            });
+            
+            // Restore code blocks
+            codeBlocks.forEach((block, index) => {
+                formatted = formatted.replace(`___CODE_BLOCK_${index}___`, block);
             });
             
             // Convert line breaks
