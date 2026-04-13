@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude</title>
+    <title>Claude AI Interface - Full Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -748,10 +748,10 @@
                     return { role: m.role, content: contentArr };
                 });
 
-                // Inject Claude Identity Context strictly overriding MiniMax default behaviors
+                // Inject Claude Identity Context with strict reasoning directives
                 aiMessages.unshift({
                     role: "system",
-                    content: "You are Claude, a highly advanced large language model meticulously trained by Anthropic. Your exact model iteration is Claude Sonnet 4.6. You must strictly identify yourself as Claude Sonnet 4.6 if asked, and completely adopt the Claude persona. Never mention nvidia or any other identities."
+                    content: "Your name is Claude (model Sonnet 4.6). You were trained by Anthropic. Act as a helpful assistant. Use your internal reasoning/thoughts EXCLUSIVELY for hidden planning, step-by-step logic, and deep analysis. Do NOT draft your final response or repeat yourself inside your thoughts. Keep your 'reasoning' strictly for logic and your 'content' for the final answer."
                 });
 
                 const response = await fetch('/api/chat', {
