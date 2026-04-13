@@ -489,7 +489,52 @@
             </div>
         </div>
 
-        <!-- View: Artifacts -->
+        <!-- View: Project Details -->
+        <div id="view-project-details" class="hidden flex-1 overflow-y-auto custom-scroll p-10 bg-[#212121]">
+            <div class="max-w-5xl mx-auto">
+                <div class="flex items-center gap-3 mb-6">
+                    <button onclick="setView('projects')" class="p-2 hover:bg-[#2f2f2f] rounded-lg text-gray-500"><i data-lucide="arrow-left" class="w-5 h-5"></i></button>
+                    <h2 id="projectDetailName" class="font-serif text-3xl text-white">Project Name</h2>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-10">
+                    <!-- Left: Control Panel -->
+                    <div class="lg:col-span-2 space-y-10">
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-white font-medium flex items-center gap-2"><i data-lucide="scroll-text" class="w-4 h-4 text-[#d97757]"></i> Project Instructions</h3>
+                                <button onclick="saveProjectSettings()" class="text-xs text-[#d97757] hover:underline">Save changes</button>
+                            </div>
+                            <textarea id="projectInstructions" 
+                                class="w-full bg-[#171717] border border-[#333] rounded-xl p-4 text-sm text-gray-300 min-h-[150px] outline-none focus:border-[#d97757] transition-all"
+                                placeholder="Example: 'Always keep responses concise and focused on Python 3.10 best practices...'"></textarea>
+                        </div>
+
+                        <div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h3 class="text-white font-medium flex items-center gap-2"><i data-lucide="file-text" class="w-4 h-4 text-[#d97757]"></i> Project Materials</h3>
+                                <button class="text-xs text-gray-400 hover:text-white border border-[#444] px-2 py-1 rounded">Add content</button>
+                            </div>
+                            <div id="projectMaterialsList" class="grid grid-cols-1 gap-3">
+                                <div class="p-4 border border-[#333] rounded-xl bg-[#171717] text-gray-500 text-sm italic">No materials added yet.</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right: History -->
+                    <div class="space-y-6">
+                        <button onclick="startNewChatInProject()" class="w-full py-3 bg-white text-black rounded-xl font-medium hover:bg-gray-200 transition-colors flex items-center justify-center gap-2">
+                            <i data-lucide="plus" class="w-4 h-4"></i> New Chat in Project
+                        </button>
+                        
+                        <div class="pt-6 border-t border-[#333]">
+                            <h3 class="text-white font-medium mb-4 text-sm uppercase tracking-wider opacity-60">Project Chats</h3>
+                            <div id="projectChatList" class="space-y-2"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
         <div id="view-artifacts" class="hidden flex-1 overflow-y-auto custom-scroll p-10">
             <div class="max-w-5xl mx-auto">
                 <div class="flex justify-between items-center mb-8">
@@ -523,6 +568,7 @@
         let allArtifacts = JSON.parse(localStorage.getItem('claude_artifacts_final') || '[]');
         let allProjects = JSON.parse(localStorage.getItem('claude_projects_final') || '[]');
         let currentChatId = null;
+        let currentProjectId = null;
         let isSidebarCollapsed = false;
 
         let supabaseClient = null;
@@ -643,15 +689,6 @@
         }
 
         function setView(view) {
-            const sections = ['chat', 'search-page', 'projects', 'artifacts'];
-            sections.forEach(s => document.getElementById(`view-${s}`).classList.add('hidden'));
-            document.getElementById(`view-${view}`).classList.remove('hidden');
-
-            ['chats', 'projects', 'artifacts'].forEach(n => document.getElementById(`nav-${n}`).classList.remove('active-sidebar-item'));
-            if (['search-page', 'projects', 'artifacts'].includes(view)) {
-                const id = view === 'search-page' ? 'chats' : view;
-                document.getElementById(`nav-${id}`).classList.add('active-sidebar-item');
-            }
 
             if (view === 'search-page') renderSearchPage();
             if (view === 'artifacts') renderArtifacts();
@@ -764,6 +801,9 @@
 
             try {
                 // Build structured array representation for Open Router API
+                const chat = allChats.find(c => c.id === currentChatId);
+                const project = chat.projectId ? allProjects.find(p => p.id === chat.projectId) : null;
+
                 const aiMessages = chat.messages.slice(0, -1).map(m => {
                     let contentArr = [];
                     if (m.image) contentArr.push({ type: "image_url", image_url: { url: m.image } });
@@ -771,11 +811,20 @@
                     return { role: m.role, content: contentArr };
                 });
 
-                // Inject Claude Identity Context with strict reasoning directives
-                aiMessages.unshift({
-                    role: "system",
-                    content: "Your name is Claude (model Sonnet 4.6). You were trained by Anthropic. Act as a helpful assistant. Use your internal reasoning/thoughts EXCLUSIVELY for hidden planning, step-by-step logic, and deep analysis. Do NOT draft your final response or repeat yourself inside your thoughts. Keep your 'reasoning' strictly for logic and your 'content' for the final answer."
-                });
+                // Inject base identity and project context if applicable
+                let systemPrompt = "Your name is Claude (model Sonnet 4.6). You were trained by Anthropic. Act as a helpful assistant. ";
+                
+                if (project) {
+                    systemPrompt += `\n\n[PROJECT CONTEXT: ${project.name}]\n`;
+                    if (project.instructions) systemPrompt += `Specific Instructions for this Project: ${project.instructions}\n`;
+                    if (project.materials && project.materials.length > 0) {
+                        systemPrompt += `Shared Background/Materials:\n${project.materials.map(m => `--- ${m.title} ---\n${m.content}`).join('\n\n')}\n`;
+                    }
+                }
+
+                systemPrompt += "\nUse your internal reasoning/thoughts EXCLUSIVELY for hidden planning and logic. Do NOT repeat instructions in your reasoning.";
+
+                aiMessages.unshift({ role: "system", content: systemPrompt });
 
                 const response = await fetch('/api/chat', {
                     method: 'POST',
@@ -997,12 +1046,15 @@
                 empty.classList.replace('flex', 'hidden');
                 grid.classList.remove('hidden');
                 grid.innerHTML = allProjects.map(proj => `
-                    <div class="card-style group items-center justify-center py-10">
-                        <i data-lucide="folder-kanban" class="w-10 h-10 text-gray-500 mb-3"></i>
-                        <h3 class="text-white font-medium text-[16px] truncate max-w-[90%]">${proj.name}</h3>
-                        <p class="text-gray-500 text-[12px] mt-1">Created ${proj.date}</p>
-                        <div class="mt-4 opacity-0 group-hover:opacity-100 transition-opacity">
-                             <button onclick="deleteProject(event, ${proj.id})" class="text-xs text-red-400 hover:text-red-300">Delete Project</button>
+                    <div onclick="openProject(${proj.id})" class="card-style group overflow-hidden">
+                        <div class="flex flex-col items-center justify-center pt-8 pb-4">
+                            <i data-lucide="folder-kanban" class="w-10 h-10 text-gray-500 mb-2"></i>
+                            <h3 class="text-white font-medium text-[15px] truncate max-w-[90%]">${proj.name}</h3>
+                            <p class="text-gray-500 text-[11px] mt-1">Created ${proj.date}</p>
+                        </div>
+                        <div class="mt-auto px-4 py-3 bg-[#111] opacity-0 group-hover:opacity-100 transition-opacity flex justify-between items-center text-[11px]">
+                             <span class="text-gray-400">View project</span>
+                             <button onclick="deleteProject(event, ${proj.id})" class="text-red-400 hover:text-red-300">Delete</button>
                         </div>
                     </div>
                 `).join('');
@@ -1011,6 +1063,70 @@
         }
 
         function deleteProject(e, id) { e.stopPropagation(); allProjects = allProjects.filter(p => p.id !== id); saveData(); renderProjects(); }
+
+        function openProject(id) {
+            currentProjectId = id;
+            const project = allProjects.find(p => p.id === id);
+            if (!project) return;
+            
+            setView('project-details');
+            document.getElementById('projectDetailName').textContent = project.name;
+            document.getElementById('projectInstructions').value = project.instructions || "";
+            
+            renderProjectHistory(id);
+            renderProjectMaterials(project);
+            lucide.createIcons();
+        }
+
+        function saveProjectSettings() {
+            const project = allProjects.find(p => p.id === currentProjectId);
+            if (!project) return;
+            project.instructions = document.getElementById('projectInstructions').value;
+            saveData();
+            alert("Project instructions saved!");
+        }
+
+        function renderProjectHistory(projId) {
+            const list = document.getElementById('projectChatList');
+            const filtered = allChats.filter(c => c.projectId === projId);
+            
+            if (filtered.length === 0) {
+                list.innerHTML = `<div class="text-[12px] text-gray-500 opacity-60 px-2 italic">No chats in this project yet.</div>`;
+            } else {
+                list.innerHTML = filtered.map(c => `
+                    <div onclick="loadChat(${c.id})" class="group flex items-center justify-between p-2 rounded-lg hover:bg-[#2f2f2f] cursor-pointer transition-colors">
+                        <span class="text-[13px] text-gray-300 truncate">${c.title}</span>
+                        <i data-lucide="chevron-right" class="w-3.5 h-3.5 text-gray-600 opacity-0 group-hover:opacity-100"></i>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderProjectMaterials(project) {
+            const list = document.getElementById('projectMaterialsList');
+            if (!project.materials || project.materials.length === 0) {
+                list.innerHTML = `<div class="p-4 border border-[#333] rounded-xl bg-[#171717] text-gray-500 text-sm italic">No materials added yet. Build your knowledge base here.</div>`;
+            } else {
+                list.innerHTML = project.materials.map(m => `
+                    <div class="p-4 border border-[#333] rounded-xl bg-[#171717] flex justify-between items-center group">
+                        <div class="flex items-center gap-3">
+                            <i data-lucide="file-text" class="w-4 h-4 text-gray-500"></i>
+                            <span class="text-sm text-gray-300 font-medium">${m.title}</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function startNewChatInProject() {
+            startNewChat();
+            const chat = allChats[0]; // The newest chat
+            chat.projectId = currentProjectId;
+            chat.title = `Project Chat ${allChats.filter(c => c.projectId === currentProjectId).length}`;
+            saveData();
+            renderHistory();
+            renderProjectHistory(currentProjectId);
+        }
 
         // --- History & Search ---
         function renderHistory() {
