@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude</title>
+    <title>Claude AI Interface - Full Clone</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -835,13 +835,13 @@
                     <div class="prose max-w-full flex flex-col gap-3 ${m.role === 'user' ? 'bg-[#2f2f2f] text-white p-4 rounded-2xl max-w-[80%]' : 'text-gray-200 flex-1'}">
                         ${m.image ? `<div class="bg-white p-1 rounded-xl inline-block w-[fit-content]"><img src="${m.image}" class="max-w-[200px] max-h-[200px] object-cover rounded-lg" /></div>` : ''}
                         
-                        ${m.reasoning ? `
+                        ${(m.reasoning || (m === chat.messages[chat.messages.length - 1] && m.role === 'assistant' && !m.content)) ? `
                             <div class="bg-[#3d332d] border-l-2 border-[#d97757] p-4 rounded-r-xl text-[#d9a08b] text-sm italic mb-2">
                                 <div class="flex items-center gap-2 mb-1 opacity-80">
-                                    <i data-lucide="brain" class="w-4 h-4"></i>
-                                    <span class="font-bold uppercase tracking-wider text-[10px]">Thinking...</span>
+                                    <i data-lucide="brain" class="w-4 h-4 ${!m.content ? 'animate-pulse' : ''}"></i>
+                                    <span class="font-bold uppercase tracking-wider text-[10px]">${m.content ? 'Reasoning complete' : 'Claude is thinking...'}</span>
                                 </div>
-                                ${marked.parse(m.reasoning)}
+                                ${m.reasoning ? marked.parse(m.reasoning) : '<div class="text-[11px] opacity-50">Analyzing request...</div>'}
                             </div>
                         ` : ''}
 
