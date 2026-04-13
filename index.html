@@ -162,7 +162,7 @@
             margin-bottom: 2px;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: background-color 0.2s;
             color: #B3B3B3;
             font-size: 14px;
             position: relative;
@@ -175,7 +175,8 @@
         }
 
         .chat-item:hover .chat-options {
-            display: block;
+            opacity: 1;
+            visibility: visible;
         }
 
         .chat-item.active {
@@ -188,16 +189,24 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            padding-right: 32px;
         }
 
         .chat-options {
-            display: none;
+            opacity: 0;
+            visibility: hidden;
             padding: 4px;
             border-radius: 4px;
             cursor: pointer;
+            transition: opacity 0.2s, visibility 0.2s;
+            position: absolute;
+            right: 8px;
+            background-color: #171717;
         }
 
         .chat-options:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
             background-color: rgba(255, 255, 255, 0.1);
         }
 
@@ -777,7 +786,11 @@
             transform: none;
         }
 
-        .main-container.hidden {
+        .main-content.hidden {
+            display: none;
+        }
+
+        .hidden {
             display: none;
         }
 
@@ -809,9 +822,118 @@
                 opacity: 1;
             }
         }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -320px;
+                top: 0;
+                bottom: 0;
+                z-index: 1000;
+                transition: left 0.3s ease;
+            }
+
+            .sidebar.mobile-open {
+                left: 0;
+            }
+
+            .mobile-overlay {
+                display: none;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+            }
+
+            .mobile-overlay.active {
+                display: block;
+            }
+
+            .mobile-header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 16px 20px;
+                background-color: #171717;
+                border-bottom: 1px solid #2A2A2A;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                z-index: 100;
+            }
+
+            .mobile-menu-btn {
+                background: transparent;
+                border: none;
+                color: #FFFFFF;
+                font-size: 24px;
+                cursor: pointer;
+                padding: 8px;
+            }
+
+            .mobile-title {
+                font-size: 18px;
+                font-weight: 400;
+                color: #FFFFFF;
+                font-family: 'Charter', Georgia, 'Times New Roman', serif;
+            }
+
+            .main-content {
+                padding-top: 60px;
+            }
+
+            .welcome-section {
+                padding: 40px 20px;
+            }
+
+            .chat-container {
+                padding: 20px 16px;
+                padding-bottom: 160px;
+            }
+
+            .input-container {
+                left: 0;
+                right: 0;
+                bottom: 0;
+                padding: 16px;
+            }
+
+            .input-wrapper {
+                max-width: 100%;
+            }
+
+            .action-buttons {
+                padding: 0 16px 16px;
+                gap: 8px;
+            }
+
+            .action-btn {
+                font-size: 13px;
+                padding: 8px 14px;
+            }
+
+            .bubble {
+                max-width: 85%;
+            }
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Overlay -->
+    <div class="mobile-overlay" id="mobileOverlay" onclick="toggleMobileSidebar()"></div>
+
+    <!-- Mobile Header -->
+    <div class="mobile-header d-md-none">
+        <button class="mobile-menu-btn" onclick="toggleMobileSidebar()">☰</button>
+        <span class="mobile-title">Claude</span>
+        <button class="mobile-menu-btn" onclick="startNewChat()">+</button>
+    </div>
+
     <!-- Login Screen -->
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
@@ -884,7 +1006,7 @@
                         <div class="user-avatar">R</div>
                         <div class="user-info">
                             <div class="user-name">raj</div>
-                            <div class="user-plan">Free plan</div>
+                            <div class="user-plan">Premium workspace</div>
                         </div>
                     </div>
                     <div class="footer-actions">
@@ -1254,6 +1376,14 @@
                 });
             }
         });
+
+        // Mobile sidebar toggle
+        function toggleMobileSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.getElementById('mobileOverlay');
+            sidebar.classList.toggle('mobile-open');
+            overlay.classList.toggle('active');
+        }
     </script>
 </body>
 </html>
