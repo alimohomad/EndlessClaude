@@ -1122,11 +1122,11 @@
 
     <div class="container hidden" id="mainContainer">
         <!-- Sidebar Container -->
-        <aside class="w-[280px] bg-[#171717] flex flex-col h-full border-r border-[#262626]">
+        <aside class="w-[280px] bg-[#171717] flex flex-col h-full border-r border-[#262626] transition-all duration-300" id="sidebar">
             <!-- Header -->
             <div class="p-4 flex items-center justify-between">
-                <h1 class="claude-logo text-2xl text-white font-semibold">Claude</h1>
-                <button class="p-1.5 hover:bg-[#202020] rounded-lg transition-colors text-gray-400">
+                <h1 class="claude-logo text-2xl text-white font-semibold" id="sidebarTitle">Claude</h1>
+                <button class="p-1.5 hover:bg-[#202020] rounded-lg transition-colors text-gray-400" onclick="toggleSidebar()">
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <rect width="18" height="18" x="3" y="3" rx="2"/>
                         <path d="M9 3v18"/>
@@ -1402,6 +1402,26 @@
             const messageInput = document.getElementById('messageInput');
             messageInput.value = prompts[action] || prompts['claude'];
             sendMessage();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const sidebarTitle = document.getElementById('sidebarTitle');
+            const sidebarTexts = sidebar.querySelectorAll('span:not(.truncate)');
+            
+            if (sidebar.classList.contains('w-[280px]')) {
+                // Collapse sidebar
+                sidebar.classList.remove('w-[280px]');
+                sidebar.classList.add('w-[60px]');
+                sidebarTitle.classList.add('hidden');
+                sidebarTexts.forEach(text => text.classList.add('hidden'));
+            } else {
+                // Expand sidebar
+                sidebar.classList.remove('w-[60px]');
+                sidebar.classList.add('w-[280px]');
+                sidebarTitle.classList.remove('hidden');
+                sidebarTexts.forEach(text => text.classList.remove('hidden'));
+            }
         }
 
         function deleteChat(chatId) {
