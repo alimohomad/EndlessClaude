@@ -378,10 +378,15 @@
                             <input type="file" id="chatFileInput" class="hidden">
                             <button onclick="document.getElementById('chatFileInput').click()" class="p-1.5 text-gray-500 hover:text-gray-300"><i data-lucide="plus"
                                     class="w-5 h-5"></i></button>
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="flex items-center gap-1.5 px-2 py-1 hover:bg-[#2f2f2f] rounded text-[13px] text-gray-500 cursor-pointer">
-                                    <span>Sonnet 4.6</span><i data-lucide="chevron-down" class="w-3 h-3"></i></div>
+                                <div class="relative flex items-center">
+                                    <select id="modelSelector" class="appearance-none bg-transparent text-[13px] text-gray-500 hover:bg-[#2f2f2f] rounded outline-none cursor-pointer py-1 pl-2 pr-6 transition-colors">
+                                        <option value="claude-sonnet-4-6" class="bg-[#212121] text-white">Sonnet 4.6</option>
+                                        <option value="claude-opus-4.6-fast" class="bg-[#212121] text-white">Opus 4.6 Fast</option>
+                                        <option value="claude-opus-4-6" class="bg-[#212121] text-white">Opus 4.6</option>
+                                        <option value="claude-haiku-4-5" class="bg-[#212121] text-white">Haiku 4.5</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="w-3 h-3 text-gray-500 absolute right-1 pointer-events-none"></i>
+                                </div>
                                 <button onclick="sendMessage()" id="sendBtn"
                                     class="p-1 text-gray-500 hover:text-[#d97757] transition-colors"><i
                                         data-lucide="circle-arrow-up" class="w-6 h-6"></i></button>
@@ -656,9 +661,11 @@
                     promptText = input;
                 }
 
-                // Using claude-sonnet which is natively supported and stable
+                // Retrieve selected model
+                const selectedModel = document.getElementById('modelSelector') ? document.getElementById('modelSelector').value : 'claude-sonnet-4-6';
+                
                 const response = await puter.ai.chat(promptText, {
-                    model: 'claude-sonnet',
+                    model: selectedModel,
                     stream: true
                 });
 
