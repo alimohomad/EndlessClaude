@@ -1522,6 +1522,9 @@
                     fullResponse += part?.text || '';
                 }
 
+                // Log the raw response to debug
+                console.log('Raw response:', fullResponse);
+
                 addMessage(fullResponse, false);
             } catch (error) {
                 removeLoading();
