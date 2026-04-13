@@ -689,6 +689,34 @@
         }
 
         function setView(view) {
+            const sections = ['chat', 'search-page', 'projects', 'artifacts', 'project-details'];
+            sections.forEach(s => {
+                const el = document.getElementById(`view-${s}`);
+                if (el) el.classList.add('hidden');
+            });
+            
+            const target = document.getElementById(`view-${view}`);
+            if (target) {
+                target.classList.remove('hidden');
+            } else {
+                console.warn("View not found:", view);
+                // Fallback to chat if view is missing
+                document.getElementById(`view-chat`).classList.remove('hidden');
+            }
+
+            // Update sidebar active states
+            ['chats', 'projects', 'artifacts'].forEach(n => {
+                const navBtn = document.getElementById(`nav-${n}`);
+                if (navBtn) navBtn.classList.remove('active-sidebar-item');
+            });
+
+            if (['search-page', 'projects', 'artifacts', 'project-details'].includes(view)) {
+                let activeId = view;
+                if (view === 'search-page') activeId = 'chats';
+                if (view === 'project-details') activeId = 'projects';
+                const activeNav = document.getElementById(`nav-${activeId}`);
+                if (activeNav) activeNav.classList.add('active-sidebar-item');
+            }
 
             if (view === 'search-page') renderSearchPage();
             if (view === 'artifacts') renderArtifacts();
