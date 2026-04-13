@@ -1,10 +1,11 @@
 const https = require('https');
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
-    'https://zbgljlughkavbzueopjx.supabase.co',
-    'sb_publishable_otdTGesO-mgeHQuXHIVZcA_ZluiPs3b'
-);
+// Create Supabase client using Service Role Key from environment variable to securely bypass RLS
+// We fallback to the anon key just in case, but warn that it will fail without RLS policies
+const supabaseUrl = 'https://zbgljlughkavbzueopjx.supabase.co';
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || 'sb_publishable_otdTGesO-mgeHQuXHIVZcA_ZluiPs3b';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 module.exports = async (req, res) => {
     // Enable CORS for Vercel
@@ -29,14 +30,14 @@ module.exports = async (req, res) => {
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         
-        // Fetch API keys from Supabase (Requires RLS to either be off for api_keys or allowed to read)
+        // Fetch securely from Supabase
         const { data: keysData, error } = await supabase
             .from('api_keys')
             .select('key')
             .eq('is_active', true);
 
         if (error || !keysData || keysData.length === 0) {
-            console.error("Supabase Key Fetch Error: ", error);
+            console.error("Supabase Key Fetch Error (Make sure SUPABASE_SERVICE_ROLE_KEY is set in Vercel): ", error);
             res.status(500).json({ error: "No API keys configured or database error" });
             return;
         }
@@ -60,7 +61,13 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
             return;
         }
 
-        const apiKey = apiKeys[attempts];
+        // Randomly select an API key to distribute load (as requested by user)
+        const randomIndex = Math.floor(Math.random() * apiKeys.length);
+        const apiKey = apiKeys[randomIndex];
+        
+        // Remove the key we just tried from the array so we don't try it again during fallback
+        const updatedApiKeys = [...apiKeys];
+        updatedApiKeys.splice(randomIndex, 1);
 
         const payload = {
             model: data.model || "minimax/minimax-m2.5:free",
@@ -82,9 +89,9 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
 
         const proxyReq = https.request(options, (proxyRes) => {
             if (proxyRes.statusCode !== 200) {
-                console.log(`API Key ${attempts + 1}/${apiKeys.length} failed with status ${proxyRes.statusCode}. Retrying...`);
+                console.log(`API Key failed with status ${proxyRes.statusCode}. Retrying with another random key...`);
                 proxyRes.on('data', () => {}); 
-                tryOpenRouterProxy(data, res, apiKeys, attempts + 1).then(resolve);
+                tryOpenRouterProxy(data, res, updatedApiKeys, attempts + 1).then(resolve);
                 return;
             }
 
@@ -95,7 +102,7 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
 
         proxyReq.on('error', (e) => {
             console.error("OpenRouter Proxy Error:", e);
-            tryOpenRouterProxy(data, res, apiKeys, attempts + 1).then(resolve);
+            tryOpenRouterProxy(data, res, updatedApiKeys, attempts + 1).then(resolve);
         });
 
         proxyReq.write(JSON.stringify(payload));

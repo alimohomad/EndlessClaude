@@ -34,10 +34,10 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             
-            <!-- API Keys Management -->
+            <!-- API Keys Management dynamically wired to Supabase API Table via Service Role -->
             <div class="bg-[#212121] p-6 rounded-2xl border border-[#333]">
                 <h3 class="text-xl font-medium mb-4 flex items-center gap-2 text-white"><i data-lucide="key" class="w-5 h-5 text-yellow-500"></i> OpenRouter API Keys</h3>
-                <p class="text-sm text-gray-400 mb-4">Keys are managed seamlessly via backend Round-Robin.</p>
+                <p class="text-sm text-gray-400 mb-4">Keys are managed seamlessly via backend randomizer.</p>
                 <div class="flex gap-2 mb-4">
                     <input type="text" id="newApiKey" placeholder="sk-or-v1-..." class="flex-1 bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-2 text-white outline-none focus:border-yellow-500">
                     <button onclick="addApiKey()" class="bg-yellow-600 hover:bg-yellow-700 text-white font-medium px-4 py-2 rounded-lg transition-colors">Add</button>
@@ -98,7 +98,6 @@
                 document.getElementById('loginScreen').classList.add('hidden');
                 document.getElementById('dashboard').classList.remove('hidden');
                 document.body.classList.remove('items-center', 'justify-center');
-                fetchKeys();
             } else {
                 document.getElementById('loginError').classList.remove('hidden');
             }
@@ -108,12 +107,11 @@
             window.location.reload();
         }
 
-        // Base Supabase client with Anon Key for fetching/inserting API Keys and Promo Codes
-        const baseClient = supabase.createClient('https://zbgljlughkavbzueopjx.supabase.co', 'sb_publishable_otdTGesO-mgeHQuXHIVZcA_ZluiPs3b');
-
+        // Add native fetch logic mapped to supabaseClient
         async function fetchKeys() {
+            if(!supabaseClient) return;
             try {
-                const { data, error } = await baseClient.from('api_keys').select('key');
+                const { data, error } = await supabaseClient.from('api_keys').select('key');
                 if (error) throw error;
                 const list = document.getElementById('apiKeysList');
                 list.innerHTML = '';
@@ -126,10 +124,11 @@
         }
 
         async function addApiKey() {
+            if(!supabaseClient) return alert("Connect Supabase Service Role first!");
             const val = document.getElementById('newApiKey').value;
             if(!val) return;
             try {
-                const { error } = await baseClient.from('api_keys').insert([{ key: val.trim() }]);
+                const { error } = await supabaseClient.from('api_keys').insert([{ key: val.trim() }]);
                 if (error) throw error;
                 document.getElementById('newApiKey').value = '';
                 fetchKeys();
@@ -143,6 +142,7 @@
             supabaseClient = supabase.createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
             document.getElementById('sbStatus').classList.remove('hidden');
             localStorage.setItem('admin_sb_key', key);
+            fetchKeys();
         }
 
         if(localStorage.getItem('admin_sb_key')) {
@@ -180,7 +180,7 @@
             const stat = document.getElementById('promoStatus');
             stat.textContent = "Generating..."; stat.className = "text-yellow-400 text-sm mt-2";
 
-            const { data, error } = await baseClient
+            const { data, error } = await supabaseClient
                 .from('promo_codes')
                 .insert([{ code: code, duration_days: days }]);
 
