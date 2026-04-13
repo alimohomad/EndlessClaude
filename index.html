@@ -3,1651 +3,487 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Claude AI Dashboard</title>
+    <title>Claude AI Interface - Premium</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
-    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://js.puter.com/v2/"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
         body {
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background-color: #0D0D0D;
-            color: #FFFFFF;
-            height: 100vh;
-            overflow: hidden;
-            font-size: 16px;
-            line-height: 1.5;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
+            font-family: 'Inter', sans-serif;
+            background-color: #212121;
+            color: #e3e3e3;
         }
 
-        .container {
-            display: flex;
-            height: 100vh;
-        }
-
-        .sidebar {
-            width: 320px;
-            min-width: 320px;
-            max-width: 320px;
-            background-color: #171717;
-            display: flex;
-            flex-direction: column;
-            padding: 0;
-            border-right: 1px solid #2A2A2A;
-            overflow: hidden;
-            height: 100vh;
-        }
-
-        .sidebar-top {
-            padding: 16px;
-            border-bottom: 1px solid #2A2A2A;
-            flex-shrink: 0;
-        }
-
-        .sidebar-bottom {
-            margin-top: auto;
-            flex-shrink: 0;
-        }
-
-        .sidebar-brand {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 0 16px 0;
-        }
-
-        .brand-text {
-            font-size: 20px;
-            font-weight: 400;
-            color: #FFFFFF;
-            font-family: 'Charter', Georgia, 'Times New Roman', serif;
-        }
-
-        .sidebar-nav {
-            padding: 0;
-            margin-top: 8px;
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 10px 12px;
-            margin-bottom: 2px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #B3B3B3;
-            font-size: 14px;
-            font-weight: 400;
-            user-select: none;
-        }
-
-        .nav-item span {
-            flex: 1;
-        }
-
-        .nav-item:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
-        }
-
-        .nav-item i {
-            width: 18px;
-            height: 18px;
-            flex-shrink: 0;
-        }
-
-        .sidebar-section {
-            flex: 1;
-            padding: 16px;
-            overflow-y: auto;
-            min-height: 0;
-        }
-
-        .section-title {
-            font-size: 11px;
-            color: #666666;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 8px;
-            padding: 0;
-            font-weight: 500;
-        }
-
-        .sidebar-header {
-            margin-bottom: 0;
-        }
-
-        .new-chat-btn {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: #B3B3B3;
-            padding: 10px 12px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .new-chat-btn:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
-        }
-
-        .new-chat-btn i {
-            width: 18px;
-            height: 18px;
-        }
-
-        .chat-list {
-            overflow-y: auto;
-            padding: 0;
-        }
-
-        .chat-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 10px 12px;
-            margin-bottom: 2px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            color: #B3B3B3;
-            font-size: 14px;
-            position: relative;
-            user-select: none;
-        }
-
-        .chat-item:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
-        }
-
-        .chat-item:hover .chat-options {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .chat-item.active {
-            background-color: rgba(255, 255, 255, 0.08);
-            color: #FFFFFF;
-        }
-
-        .chat-title {
-            flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            padding-right: 32px;
-        }
-
-        .chat-options {
-            opacity: 0;
-            visibility: hidden;
-            padding: 4px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: opacity 0.2s, visibility 0.2s;
-            position: absolute;
-            right: 8px;
-            background-color: #171717;
-        }
-
-        .chat-options:hover {
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-
-        .sidebar-footer {
-            padding: 16px;
-            border-top: 1px solid #2A2A2A;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-shrink: 0;
-            background-color: #171717;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #E5E5E5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
-            color: #171717;
-        }
-
-        .sidebar-footer {
-            padding: 16px;
-            border-top: 1px solid #2A2A2A;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            flex-shrink: 0;
-        }
-
-        .user-profile {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            flex: 1;
-            min-width: 0;
-        }
-
-        .user-avatar {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            background-color: #E5E5E5;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
-            color: #171717;
-            flex-shrink: 0;
-        }
-
-        .user-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .user-name {
-            font-size: 14px;
-            color: #FFFFFF;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: visible;
-        }
-
-        .user-plan {
-            font-size: 12px;
-            color: #666666;
-            white-space: nowrap;
-            overflow: visible;
-        }
-
-        .footer-actions {
-            display: flex;
-            gap: 4px;
-            flex-shrink: 0;
-        }
-
-        .footer-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            background: transparent;
-            border: none;
-            color: #B3B3B3;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            flex-shrink: 0;
-        }
-
-        .footer-btn:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
-        }
-
-        .footer-btn i {
-            width: 16px;
-            height: 16px;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: 60px;
-            background-color: #0A0A0A;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px 0;
-            border-right: 1px solid #1F1F1F;
-        }
-
-        .sidebar-icon {
-            width: 40px;
-            height: 40px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-            cursor: pointer;
-            color: #888888;
-            transition: all 0.2s;
-            border-radius: 8px;
-            position: relative;
-        }
-
-        .sidebar-icon:hover {
-            background-color: #222222;
-            color: #FFFFFF;
-        }
-
-        .sidebar-icon.active {
-            color: #FF7A45;
-        }
-
-        .sidebar-icon.locked {
-            opacity: 0.4;
-            cursor: not-allowed;
-        }
-
-        .sidebar-icon.locked:hover {
-            background-color: transparent;
-            color: #888888;
-        }
-
-        .lock-icon {
-            position: absolute;
-            bottom: -2px;
-            right: -2px;
-            width: 12px;
-            height: 12px;
-            background-color: #FF7A45;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 8px;
-        }
-
-        .sidebar-bottom {
-            margin-top: auto;
-        }
-
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            height: 100vh;
-            position: relative;
-        }
-
-        /* Welcome Section */
-        .welcome-section {
-            text-align: center;
-            padding: 60px 20px;
-            transition: all 0.3s;
-        }
-
-        .welcome-section.hidden {
-            display: none;
-        }
-
-        .logo-icon {
-            width: 28px;
-            height: 28px;
-            display: inline-block;
-            margin-right: 8px;
-            vertical-align: middle;
-            fill: #FF7A45;
-            opacity: 0.9;
-            transform: scale(0.9);
-        }
-
-        .welcome-text {
-            font-size: 32px;
-            font-weight: 400;
-            color: #FFFFFF;
-            letter-spacing: 0.3px;
-            font-family: 'Charter', Georgia, 'Times New Roman', serif;
-        }
-
-        /* Chat Container */
-        .chat-container {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            padding-bottom: 140px;
-            max-width: 800px;
-            width: 100%;
-            margin: 0 auto;
-        }
-
-        /* Chat Messages */
-        .chat-messages {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .message {
-            display: flex;
-            margin-bottom: 16px;
-            animation: fadeIn 0.3s ease;
-            max-width: 100%;
-        }
-
-        .message.user {
-            justify-content: flex-end;
-        }
-
-        .message.ai {
-            justify-content: flex-start;
-            gap: 8px;
-        }
-
-        .message-icon {
-            width: 24px;
-            height: 24px;
-            fill: #FF7A45;
-            opacity: 0.9;
-            flex-shrink: 0;
-            margin-top: 4px;
-        }
-
-        .bubble {
-            max-width: fit-content;
-            padding: 12px 16px;
-            border-radius: 18px;
-            font-size: 15px;
-            line-height: 1.6;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-        }
-
-        .user .bubble {
-            background-color: #2F2F2F !important;
-            color: #FFFFFF !important;
-            border-radius: 18px;
-            max-width: 500px;
-        }
-
-        .ai .bubble {
-            background-color: transparent !important;
-            color: #E5E5E5;
-            padding: 0;
-            max-width: 100%;
-        }
-
-        /* Hide scrollbars */
-        .chat-container::-webkit-scrollbar,
-        .sidebar-section::-webkit-scrollbar,
-        .chat-list::-webkit-scrollbar {
-            width: 0;
-            height: 0;
-            display: none;
-        }
-
-        .chat-container,
-        .sidebar-section,
-        .chat-list {
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-
-        /* Code blocks */
-        .bubble pre {
-            background-color: #1A1A1A;
-            border: 1px solid #2A2A2A;
-            border-radius: 12px;
-            padding: 0;
-            overflow: hidden;
-            margin: 12px 0;
-            max-width: 100%;
-            position: relative;
-        }
-
-        .code-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 16px;
-            background-color: #0D0D0D;
-            border-bottom: 1px solid #2A2A2A;
-        }
-
-        .code-language {
-            font-size: 12px;
-            color: #888888;
-            font-family: 'Inter', system-ui, sans-serif;
-            text-transform: lowercase;
-        }
-
-        .copy-button {
-            background: transparent;
-            border: none;
-            color: #888888;
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-
-        .copy-button:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
-        }
-
-        .bubble code {
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            font-size: 13px;
-            line-height: 1.6;
-            color: #E5E5E5;
-        }
-
-        .bubble pre code {
-            display: block;
-            padding: 16px;
-            overflow-x: auto;
-            white-space: pre;
-        }
-
-        .bubble :not(pre) > code {
-            background-color: #2A2A2A;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 13px;
-            white-space: normal;
-        }
-
-        /* Markdown formatting */
-        .bubble strong {
-            font-weight: 600;
-            color: #FFFFFF;
-        }
-
-        .bubble em {
-            font-style: italic;
-            color: #E5E5E5;
-        }
-
-        .bubble h1, .bubble h2, .bubble h3 {
-            color: #FFFFFF;
-            margin: 16px 0 8px 0;
-            font-weight: 600;
-        }
-
-        .bubble h1 {
-            font-size: 24px;
-        }
-
-        .bubble h2 {
-            font-size: 20px;
-        }
-
-        .bubble h3 {
-            font-size: 18px;
-        }
-
-        .bubble strong {
-            font-weight: 600;
-            color: #FFFFFF;
-        }
-
-        /* Input Container */
-        .input-container {
-            position: fixed;
-            bottom: 20px;
-            left: 320px;
-            right: 20px;
-            display: flex;
-            justify-content: center;
-            z-index: 100;
-        }
-
-        .input-wrapper {
-            width: 100%;
-            max-width: 800px;
-            background: #1E1E1E;
-            border-radius: 16px;
-            padding: 12px 16px;
-            box-shadow: 0 0 0 1px #2C2C2C;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .input-icon {
-            width: 24px;
-            height: 24px;
-            color: #888888;
-            cursor: pointer;
-            transition: color 0.2s;
-        }
-
-        .input-icon:hover {
-            color: #FFFFFF;
-        }
-
-        .input-field {
-            flex: 1;
-            background: transparent;
-            border: none;
-            outline: none;
-            color: #FFFFFF;
-            font-size: 15px;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .input-field::placeholder {
-            color: #666666;
-            font-weight: 400;
-        }
-
-        .input-field:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .input-controls {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .model-selector {
-            background-color: transparent;
-            border: none;
-            color: #888888;
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 13px;
-            font-weight: 400;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .model-selector:hover {
-            color: #B3B3B3;
-        }
-
-        /* Wave Icon */
-        .wave {
-            display: flex;
-            align-items: center;
-            gap: 2px;
-            height: 20px;
-        }
-
-        .wave span {
-            display: inline-block;
-            width: 2px;
-            background: #888888;
-            border-radius: 2px;
-            animation: wave 1.2s infinite ease-in-out;
-        }
-
-        .wave span:nth-child(1) {
-            height: 8px;
-            animation-delay: 0s;
-        }
-
-        .wave span:nth-child(2) {
-            height: 14px;
-            animation-delay: 0.1s;
-        }
-
-        .wave span:nth-child(3) {
-            height: 10px;
-            animation-delay: 0.2s;
-        }
-
-        .wave span:nth-child(4) {
-            height: 12px;
-            animation-delay: 0.3s;
-        }
-
-        @keyframes wave {
-            0%, 100% {
-                transform: scaleY(0.7);
-            }
-            50% {
-                transform: scaleY(1.3);
-            }
-        }
-
-        /* Quick Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 0 20px 16px;
-            transition: all 0.3s;
-        }
-
-        .action-buttons.hidden {
-            display: none;
-        }
-
-        .action-btn {
-            background: transparent;
-            border: 1px solid #333333;
-            color: #B3B3B3;
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        .action-btn:hover {
-            border-color: #555555;
-            color: #FFFFFF;
-        }
-
-        .action-btn i {
-            width: 14px;
-            height: 14px;
-            stroke: #B3B3B3;
-        }
-
-        .action-btn:hover i {
-            stroke: #FFFFFF;
-        }
-
-        /* Send Button */
-        .send-button {
-            width: 36px;
-            height: 36px;
-            background-color: #FF7A45;
-            border: none;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            color: #FFFFFF;
-        }
-
-        .send-button:hover {
-            background-color: #FF8F5A;
-        }
-
-        .send-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        /* Chat Messages */
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .message {
-            margin-bottom: 20px;
-            padding: 15px;
-            border-radius: 12px;
-            animation: fadeIn 0.3s ease;
-        }
-
-        /* Login Screen */
-        .login-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #0D0D0D;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 9999;
-        }
-
-        .login-screen.hidden {
-            display: none;
-        }
-
-        .login-container {
-            text-align: center;
-            padding: 40px;
-            background-color: #1E1E1E;
-            border-radius: 20px;
-            box-shadow: 0 0 0 1px #2C2C2C;
-            max-width: 400px;
-        }
-
-        .login-logo {
-            width: 64px;
-            height: 64px;
-            margin: 0 auto 20px;
-            fill: #FF7A45;
-            opacity: 0.9;
-        }
-
-        .login-title {
-            font-size: 28px;
-            font-weight: 400;
-            margin-bottom: 10px;
-            letter-spacing: 0.3px;
-            font-family: 'Charter', Georgia, 'Times New Roman', serif;
-        }
-
-        .login-subtitle {
-            font-size: 16px;
-            color: #B3B3B3;
-            margin-bottom: 30px;
-        }
-
-        .login-button {
-            background-color: #FF7A45;
-            color: #FFFFFF;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 10px;
-            font-size: 16px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .login-button:hover {
-            background-color: #FF8F5A;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(255, 122, 69, 0.3);
-        }
-
-        .login-button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .main-content.hidden {
-            display: none;
-        }
-
-        .hidden {
-            display: none;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .loading {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: #888888;
-            animation: pulse 1.5s infinite;
-        }
-
-        @keyframes pulse {
-            0%, 100% {
-                opacity: 0.3;
-            }
-            50% {
-                opacity: 1;
-            }
-        }
-
-        /* Mobile Responsive */
-        @media (max-width: 768px) {
-            .sidebar {
-                position: fixed;
-                left: -320px;
-                top: 0;
-                bottom: 0;
-                z-index: 1000;
-                transition: left 0.3s ease;
-            }
-
-            .sidebar.mobile-open {
-                left: 0;
-            }
-
-            .mobile-overlay {
-                display: none;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 999;
-            }
-
-            .mobile-overlay.active {
-                display: block;
-            }
-
-            .mobile-header {
-                display: flex;
-                align-items: center;
-                justify-content: space-between;
-                padding: 16px 20px;
-                background-color: #171717;
-                border-bottom: 1px solid #2A2A2A;
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                z-index: 100;
-            }
-
-            .mobile-menu-btn {
-                background: transparent;
-                border: none;
-                color: #FFFFFF;
-                font-size: 24px;
-                cursor: pointer;
-                padding: 8px;
-            }
-
-            .mobile-title {
-                font-size: 18px;
-                font-weight: 400;
-                color: #FFFFFF;
-                font-family: 'Charter', Georgia, 'Times New Roman', serif;
-            }
-
-            .main-content {
-                padding-top: 60px;
-            }
-
-            .welcome-section {
-                padding: 40px 20px;
-            }
-
-            .chat-container {
-                padding: 20px 16px;
-                padding-bottom: 160px;
-            }
-
-            .input-container {
-                left: 0;
-                right: 0;
-                bottom: 0;
-                padding: 16px;
-            }
-
-            .input-wrapper {
-                max-width: 100%;
-            }
-
-            .action-buttons {
-                padding: 0 16px 16px;
-                gap: 8px;
-            }
-
-            .action-btn {
-                font-size: 13px;
-                padding: 8px 14px;
-            }
-
-            .bubble {
-                max-width: 85%;
-            }
-        }
-
-        /* Tailwind Sidebar Styles */
-        .claude-logo {
+        .font-serif {
             font-family: 'Source Serif 4', serif;
         }
 
+        /* Sidebar items */
         .sidebar-item {
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 8px 12px;
+            padding: 7px 12px;
             border-radius: 8px;
-            transition: background-color 0.2s;
+            transition: all 0.15s;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13px;
             color: #b4b4b4;
         }
 
         .sidebar-item:hover {
-            background-color: #202020;
+            background-color: #2f2f2f;
             color: #ffffff;
         }
 
-        .active-item {
-            background-color: #202020;
+        .active-sidebar-item {
+            background-color: #2f2f2f;
             color: #ffffff;
         }
 
-        .section-label {
-            font-size: 12px;
-            font-weight: 500;
-            color: #666666;
-            margin: 24px 12px 8px 12px;
+        /* Chat styles */
+        .chat-input-wrapper {
+            background-color: #212121;
+            border: 1px solid #3d3d3d;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
         }
 
-        .recent-item {
-            padding: 8px 12px;
-            font-size: 14px;
-            border-radius: 8px;
-            cursor: pointer;
-            color: #b4b4b4;
+        .action-pill {
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: transparent;
+            border: 1px solid #3d3d3d;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #b4b4b4;
+            transition: all 0.2s;
+            cursor: pointer;
         }
 
-        .recent-item:hover {
-            background-color: #202020;
-            color: #ffffff;
+        .action-pill:hover {
+            background-color: #2f2f2f;
+            border-color: #4d4d4d;
+            color: #fff;
         }
 
-        .custom-scroll::-webkit-scrollbar {
-            width: 4px;
+        /* Markdown Rendering */
+        .prose pre {
+            background-color: #1a1a1a !important;
+            border-radius: 12px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border: 1px solid #333;
+            overflow-x: auto;
         }
 
-        .custom-scroll::-webkit-scrollbar-thumb {
+        .prose code {
+            font-family: 'Consolas', monospace;
             background: #333;
-            border-radius: 10px;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.9em;
         }
+
+        .prose p { margin-bottom: 1rem; line-height: 1.6; }
+        .prose h1, .prose h2, .prose h3 { font-family: 'Source Serif 4', serif; font-weight: 600; color: white; margin-top: 1.5rem; }
+
+        .custom-scroll::-webkit-scrollbar { width: 5px; }
+        .custom-scroll::-webkit-scrollbar-thumb { background: #333; border-radius: 10px; }
+
+        #loginScreen {
+            background-color: #171717;
+            z-index: 1000;
+        }
+
+        /* Animated Sound Wave */
+        .wave-container {
+            display: flex;
+            align-items: center;
+            gap: 2px;
+            height: 14px;
+        }
+        .wave-bar {
+            width: 2px;
+            background: #666;
+            border-radius: 1px;
+        }
+        .wave-bar:nth-child(1) { height: 6px; }
+        .wave-bar:nth-child(2) { height: 12px; }
+        .wave-bar:nth-child(3) { height: 8px; }
+        .wave-bar:nth-child(4) { height: 10px; }
+        .wave-bar:nth-child(5) { height: 4px; }
     </style>
 </head>
 <body class="flex h-screen overflow-hidden">
+
     <!-- Login Screen -->
-    <div class="login-screen" id="loginScreen">
-        <div class="login-container">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="login-logo">
-                <path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"></path>
-            </svg>
-            <h1 class="login-title">Welcome to Claude</h1>
-            <p class="login-subtitle">Sign in with Puter to start chatting</p>
-            <button class="login-button" id="loginButton" onclick="handleLogin()">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                    <polyline points="10 17 15 12 10 7"></polyline>
-                    <line x1="15" y1="12" x2="3" y2="12"></line>
+    <div id="loginScreen" class="fixed inset-0 flex items-center justify-center p-6">
+        <div class="max-w-md w-full text-center space-y-8 bg-[#212121] p-10 rounded-3xl border border-[#333] shadow-2xl">
+            <div class="flex justify-center">
+                <svg width="60" height="60" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[#d97757]">
+                    <path d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z" fill="currentColor"/>
                 </svg>
-                Sign in with Puter
+            </div>
+            <div>
+                <h1 class="font-serif text-3xl text-white italic">Welcome to Claude</h1>
+                <p class="text-gray-400 mt-2">Sign in with Puter to access your Premium workspace</p>
+            </div>
+            <button onclick="handleLogin()" id="loginBtn" class="w-full py-3.5 bg-[#d97757] hover:bg-[#c06548] text-white font-semibold rounded-xl transition-all flex items-center justify-center gap-2">
+                <i data-lucide="log-in" class="w-5 h-5"></i>
+                <span>Sign in with Puter</span>
             </button>
         </div>
     </div>
 
-    <div class="container hidden" id="mainContainer">
-        <!-- Sidebar Container -->
-        <aside class="w-[280px] bg-[#171717] flex flex-col h-full border-r border-[#262626] transition-all duration-300" id="sidebar">
-            <!-- Header -->
-            <div class="p-4 flex items-center justify-between">
-                <h1 class="claude-logo text-2xl text-white font-semibold" id="sidebarTitle">Claude</h1>
-                <button class="p-1.5 hover:bg-[#202020] rounded-lg transition-colors text-gray-400" onclick="toggleSidebar()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="18" height="18" x="3" y="3" rx="2"/>
-                        <path d="M9 3v18"/>
-                    </svg>
-                </button>
-            </div>
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[260px] bg-[#171717] flex flex-col h-full border-r border-[#262626] shrink-0 transition-all duration-300">
+        <!-- Sidebar Top -->
+        <div class="p-4 flex items-center justify-between">
+            <h1 id="sidebarLogo" class="font-serif text-[22px] text-white font-semibold tracking-tight">Claude</h1>
+            <button onclick="toggleSidebar()" class="p-1.5 hover:bg-[#2f2f2f] rounded-lg transition-colors text-gray-400">
+                <i data-lucide="panel-left" class="w-[18px] h-[18px]"></i>
+            </button>
+        </div>
 
-            <!-- Main Actions -->
-            <div class="px-2 flex flex-col gap-0.5">
-                <div class="sidebar-item" onclick="startNewChat()">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M5 12h14"/>
-                        <path d="M12 5v14"/>
-                    </svg>
-                    <span>New chat</span>
-                </div>
-                <div class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="11" cy="11" r="8"/>
-                        <path d="m21 21-4.3-4.3"/>
-                    </svg>
-                    <span>Search</span>
-                </div>
-                <div class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M16 20V4a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/>
-                        <rect width="20" height="14" x="2" y="6" rx="2"/>
-                    </svg>
-                    <span>Customize</span>
-                </div>
+        <!-- Sidebar Navigation -->
+        <div class="px-2 flex flex-col gap-0.5" id="sidebarContent">
+            <div onclick="startNewChat()" class="sidebar-item">
+                <i data-lucide="plus" class="w-4 h-4"></i>
+                <span class="label">New chat</span>
             </div>
-
-            <!-- Navigation -->
-            <div class="px-2 mt-4 flex flex-col gap-0.5">
-                <div class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M7.9 20A9 9 0 1 0 4 16.1L2 22Z"/>
-                    </svg>
-                    <span>Chats</span>
-                </div>
-                <div class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <rect width="20" height="16" x="2" y="4" rx="2"/>
-                        <path d="M2 8h20"/>
-                        <path d="M15 2v2"/>
-                        <path d="M9 2v2"/>
-                    </svg>
-                    <span>Projects</span>
-                </div>
-                <div class="sidebar-item">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                        <circle cx="12" cy="12" r="1"/>
-                        <circle cx="12" cy="5" r="1"/>
-                        <circle cx="12" cy="19" r="1"/>
-                        <circle cx="19" cy="12" r="1"/>
-                        <circle cx="5" cy="12" r="1"/>
-                    </svg>
-                    <span>Artifacts</span>
-                </div>
+            <div class="sidebar-item">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                <span class="label">Search</span>
             </div>
-
-            <!-- Recents Section -->
-            <div class="flex-1 overflow-y-auto custom-scroll px-2">
-                <div class="section-label">Recents</div>
-                <div id="chatList"></div>
+            <div class="sidebar-item">
+                <i data-lucide="settings-2" class="w-4 h-4"></i>
+                <span class="label">Customize</span>
             </div>
+        </div>
 
-            <!-- User Profile Section -->
-            <div class="mt-auto p-4 border-t border-[#262626]">
-                <div class="flex items-center justify-between group cursor-pointer">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-[#d9d9d1] text-[#171717] flex items-center justify-center font-bold text-lg">
-                            R
-                        </div>
-                        <div class="flex flex-col">
-                            <span class="text-sm font-medium text-white">raj</span>
-                            <span class="text-xs text-gray-500">Free plan</span>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 text-gray-500">
-                        <button class="p-1.5 hover:bg-[#202020] rounded-lg">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" x2="12" y1="15" y2="3"/>
-                            </svg>
-                        </button>
-                        <button class="flex flex-col gap-0.5 items-center justify-center hover:bg-[#202020] p-1 rounded">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m18 15-6-6-6 6"/>
-                            </svg>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="m6 9 6 6 6-6"/>
-                            </svg>
-                        </button>
+        <div class="px-2 mt-4 flex flex-col gap-0.5" id="navContent">
+            <div class="sidebar-item">
+                <i data-lucide="message-square" class="w-4 h-4"></i>
+                <span class="label">Chats</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="folder-kanban" class="w-4 h-4"></i>
+                <span class="label">Projects</span>
+            </div>
+            <div class="sidebar-item">
+                <i data-lucide="layers" class="w-4 h-4"></i>
+                <span class="label">Artifacts</span>
+            </div>
+        </div>
+
+        <!-- Recents List -->
+        <div class="flex-1 overflow-y-auto custom-scroll px-2 mt-4" id="recentsSection">
+            <div class="label text-[11px] font-semibold text-gray-500 px-3 mb-2 uppercase tracking-wider">Recents</div>
+            <div id="chatHistory" class="space-y-0.5">
+                <!-- History items injected here -->
+            </div>
+        </div>
+
+        <!-- User Profile -->
+        <div class="p-3 border-t border-[#262626]">
+            <div class="flex items-center justify-between p-1 rounded-lg hover:bg-[#2f2f2f] cursor-pointer transition-colors">
+                <div class="flex items-center gap-2.5">
+                    <div id="userInit" class="w-8 h-8 rounded-full bg-[#d9d9d1] text-[#171717] flex items-center justify-center font-bold text-sm">R</div>
+                    <div class="flex flex-col label overflow-hidden">
+                        <span id="userName" class="text-[13px] font-medium text-white leading-tight truncate">raj</span>
+                        <span class="text-[11px] text-[#d97757] leading-tight font-medium">Premium plan</span>
                     </div>
                 </div>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="main-content flex flex-col items-center justify-start pt-20">
-            <!-- Welcome Section -->
-            <div class="welcome-section text-center" id="welcomeSection">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" class="logo-icon">
-                    <path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"></path>
-                </svg>
-                <span class="welcome-text">Welcome, BOSS</span>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="action-buttons flex gap-3 justify-center mt-8" id="actionButtons">
-                <button class="action-btn" onclick="handleActionClick('write')">
-                    <i data-lucide="pen-line"></i> Write
-                </button>
-                <button class="action-btn" onclick="handleActionClick('learn')">
-                    <i data-lucide="graduation-cap"></i> Learn
-                </button>
-                <button class="action-btn" onclick="handleActionClick('code')">
-                    <i data-lucide="code"></i> Code
-                </button>
-                <button class="action-btn" onclick="handleActionClick('life')">
-                    <i data-lucide="coffee"></i> Life stuff
-                </button>
-                <button class="action-btn" onclick="handleActionClick('claude')">
-                    <i data-lucide="sparkles"></i> Claude's choice
-                </button>
-            </div>
-
-            <!-- Chat Container -->
-            <div class="chat-container w-full">
-                <div class="chat-messages" id="chatMessages"></div>
-            </div>
-
-            <!-- Input Box -->
-            <div class="input-container">
-                <div class="input-wrapper">
-                    <input type="text" class="input-field" id="messageInput" placeholder="Reply..." disabled>
-                    <div class="input-controls">
-                        <div class="model-selector">Sonnet 4.6</div>
-                        <div class="wave">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </div>
-                        <button class="send-button" id="sendButton" disabled>
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <line x1="22" y1="2" x2="11" y2="13"></line>
-                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                            </svg>
-                        </button>
-                    </div>
+                <div class="flex items-center gap-1.5 text-gray-500 label">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    <i data-lucide="chevrons-up-down" class="w-3 h-3"></i>
                 </div>
             </div>
         </div>
-    </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 flex flex-col relative overflow-hidden bg-[#212121]">
+        
+        <!-- Header / History Scroll area -->
+        <div id="messageArea" class="flex-1 overflow-y-auto custom-scroll p-6 hidden">
+            <div id="messageContainer" class="max-w-3xl mx-auto space-y-8 pb-32">
+                <!-- Messages injected here -->
+            </div>
+        </div>
+
+        <!-- Default Welcome View -->
+        <div id="welcomeView" class="flex-1 flex flex-col items-center justify-center -mt-10">
+            <!-- Premium Badge -->
+            <div class="mb-6 px-3 py-1 bg-[#2f2f2f] rounded-full text-[12px] font-medium text-gray-300 border border-[#3d3d3d]">
+                Premium plan
+            </div>
+
+            <div class="flex items-center gap-4 mb-10">
+                <svg width="32" height="32" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[#d97757]">
+                    <path d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z" fill="currentColor"/>
+                </svg>
+                <h2 class="font-serif text-4xl text-white font-normal">Good afternoon, <span id="welcomeName">raj</span></h2>
+            </div>
+        </div>
+
+        <!-- Bottom Input Area -->
+        <div class="w-full flex flex-col items-center px-4 pb-8 z-10">
+            <div class="max-w-[720px] w-full">
+                <div class="chat-input-wrapper p-4 pb-3">
+                    <textarea 
+                        id="chatInput"
+                        class="w-full bg-transparent border-none outline-none resize-none text-[16px] text-gray-200 placeholder-gray-500 min-h-[60px]"
+                        placeholder="How can I help you today?"
+                    ></textarea>
+                    
+                    <div class="flex items-center justify-between mt-2">
+                        <button class="p-1.5 text-gray-500 hover:text-gray-300 transition-colors">
+                            <i data-lucide="plus" class="w-5 h-5"></i>
+                        </button>
+                        
+                        <div class="flex items-center gap-3">
+                            <div class="flex items-center gap-1.5 px-2 py-1 hover:bg-[#2f2f2f] rounded text-[13px] text-gray-500 transition-colors cursor-pointer">
+                                <span>Sonnet 4.6</span>
+                                <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                            </div>
+                            <!-- Sound Wave Icon from Screenshot -->
+                            <div class="wave-container px-1 cursor-pointer hover:opacity-80">
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                                <div class="wave-bar"></div>
+                            </div>
+                            <button id="sendBtn" class="p-1 text-gray-500 hover:text-gray-300 disabled:opacity-30 transition-all">
+                                <i data-lucide="circle-arrow-up" class="w-6 h-6"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Pills -->
+                <div id="actionPills" class="flex flex-wrap items-center justify-center gap-2 mt-6">
+                    <button onclick="sendPrompt('Write')" class="action-pill"><i data-lucide="pen-line" class="w-4 h-4"></i> Write</button>
+                    <button onclick="sendPrompt('Learn')" class="action-pill"><i data-lucide="graduation-cap" class="w-4 h-4"></i> Learn</button>
+                    <button onclick="sendPrompt('Code')" class="action-pill"><i data-lucide="code-2" class="w-4 h-4"></i> Code</button>
+                    <button onclick="sendPrompt('Life stuff')" class="action-pill"><i data-lucide="coffee" class="w-4 h-4"></i> Life stuff</button>
+                    <button onclick="sendPrompt('Claude\'s choice')" class="action-pill"><i data-lucide="sparkles" class="w-4 h-4"></i> Claude's choice</button>
+                </div>
+            </div>
+        </div>
+    </main>
 
     <script>
-        let isAuthenticated = false;
-        let allChats = [];
+        let allChats = JSON.parse(localStorage.getItem('claude_history') || '[]');
         let currentChatId = null;
+        let isSidebarCollapsed = false;
 
-        // Handle login button click
+        async function init() {
+            lucide.createIcons();
+            updateGreeting();
+            try {
+                const user = await puter.auth.getUser();
+                if (user) {
+                    onAuthenticated(user);
+                }
+            } catch (e) {
+                console.log("Not logged in");
+            }
+        }
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const welcomeText = document.querySelector('h2.font-serif');
+            let greeting = "Good morning";
+            if (hour >= 12 && hour < 17) greeting = "Good afternoon";
+            else if (hour >= 17) greeting = "Good evening";
+            
+            // Re-apply the font-serif class and structure
+            welcomeText.innerHTML = `${greeting}, <span id="welcomeName">${document.getElementById('welcomeName').textContent}</span>`;
+        }
+
         async function handleLogin() {
-            const loginButton = document.getElementById('loginButton');
-            loginButton.disabled = true;
-            loginButton.innerHTML = '<span class="loading"></span><span class="loading" style="margin-left: 8px;"></span><span class="loading" style="margin-left: 8px;"></span>';
-
+            const btn = document.getElementById('loginBtn');
+            btn.disabled = true;
+            btn.innerHTML = "Authenticating...";
             try {
                 await puter.auth.signIn();
                 const user = await puter.auth.getUser();
-                
-                if (user) {
-                    isAuthenticated = true;
-                    showMainInterface();
-                    loadChatsFromStorage();
-                }
-            } catch (error) {
-                console.error('Authentication error:', error);
-                loginButton.disabled = false;
-                loginButton.innerHTML = `
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
-                        <polyline points="10 17 15 12 10 7"></polyline>
-                        <line x1="15" y1="12" x2="3" y2="12"></line>
-                    </svg>
-                    Sign in with Puter
-                `;
-                alert('Login failed. Please try again.');
+                if (user) onAuthenticated(user);
+            } catch (err) {
+                btn.disabled = false;
+                btn.innerHTML = "Sign in with Puter";
+                console.error(err);
             }
         }
 
-        function showMainInterface() {
+        function onAuthenticated(user) {
             document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('mainContainer').classList.remove('hidden');
-            enableChat();
-        }
-
-        function enableChat() {
-            const messageInput = document.getElementById('messageInput');
-            const sendButton = document.getElementById('sendButton');
-            messageInput.disabled = false;
-            sendButton.disabled = false;
-        }
-
-        function startNewChat() {
-            const newChat = {
-                id: Date.now().toString(),
-                messages: [],
-                title: 'New chat'
-            };
-            allChats.push(newChat);
-            loadChat(newChat.id);
-            saveChatsToStorage();
-            updateChatList();
-        }
-
-        function loadChat(chatId) {
-            currentChatId = chatId;
-            const chat = allChats.find(c => c.id === chatId);
-            if (chat) {
-                displayMessages(chat.messages);
-                updateChatList();
-                
-                // Hide welcome if chat has messages
-                if (chat.messages.length > 0) {
-                    document.getElementById('welcomeSection').classList.add('hidden');
-                    document.getElementById('actionButtons').classList.add('hidden');
-                } else {
-                    document.getElementById('welcomeSection').classList.remove('hidden');
-                    document.getElementById('actionButtons').classList.remove('hidden');
-                }
-            }
-        }
-
-        function updateChatList() {
-            const chatList = document.getElementById('chatList');
-            chatList.innerHTML = '';
-            
-            allChats.forEach(chat => {
-                const chatItem = document.createElement('div');
-                chatItem.className = `recent-item ${chat.id === currentChatId ? 'active-item' : ''}`;
-                
-                const titleSpan = document.createElement('span');
-                titleSpan.className = 'truncate';
-                titleSpan.textContent = chat.title;
-                
-                const optionsBtn = document.createElement('button');
-                optionsBtn.className = 'text-gray-400 hover:text-white';
-                optionsBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/><circle cx="5" cy="12" r="1"/></svg>';
-                optionsBtn.onclick = (e) => {
-                    e.stopPropagation();
-                    deleteChat(chat.id);
-                };
-                
-                chatItem.appendChild(titleSpan);
-                chatItem.appendChild(optionsBtn);
-                chatItem.onclick = () => loadChat(chat.id);
-                chatList.appendChild(chatItem);
-            });
-        }
-
-        function handleActionClick(action) {
-            const prompts = {
-                'write': 'Help me write something creative and engaging.',
-                'learn': 'I want to learn something new. What would you recommend?',
-                'code': 'Help me with coding. I need assistance with programming.',
-                'life': 'I need advice on everyday life matters.',
-                'claude': 'Surprise me! Choose an interesting topic to discuss.'
-            };
-            
-            const messageInput = document.getElementById('messageInput');
-            messageInput.value = prompts[action] || prompts['claude'];
-            sendMessage();
+            document.getElementById('userName').textContent = user.username;
+            document.getElementById('welcomeName').textContent = user.username;
+            document.getElementById('userInit').textContent = user.username[0].toUpperCase();
+            renderHistory();
         }
 
         function toggleSidebar() {
+            isSidebarCollapsed = !isSidebarCollapsed;
             const sidebar = document.getElementById('sidebar');
-            const sidebarTitle = document.getElementById('sidebarTitle');
-            const sidebarTexts = sidebar.querySelectorAll('span:not(.truncate)');
-            
-            if (sidebar.classList.contains('w-[280px]')) {
-                // Collapse sidebar
-                sidebar.classList.remove('w-[280px]');
-                sidebar.classList.add('w-[60px]');
-                sidebarTitle.classList.add('hidden');
-                sidebarTexts.forEach(text => text.classList.add('hidden'));
+            const labels = document.querySelectorAll('.label');
+            const logo = document.getElementById('sidebarLogo');
+
+            if (isSidebarCollapsed) {
+                sidebar.style.width = '68px';
+                labels.forEach(l => l.style.display = 'none');
+                logo.style.display = 'none';
             } else {
-                // Expand sidebar
-                sidebar.classList.remove('w-[60px]');
-                sidebar.classList.add('w-[280px]');
-                sidebarTitle.classList.remove('hidden');
-                sidebarTexts.forEach(text => text.classList.remove('hidden'));
+                sidebar.style.width = '260px';
+                labels.forEach(l => l.style.display = 'flex');
+                logo.style.display = 'block';
             }
         }
 
-        function deleteChat(chatId) {
-            allChats = allChats.filter(c => c.id !== chatId);
-            if (chatId === currentChatId) {
-                if (allChats.length > 0) {
-                    loadChat(allChats[allChats.length - 1].id);
-                } else {
-                    startNewChat();
-                }
+        function startNewChat() {
+            currentChatId = null;
+            document.getElementById('messageArea').classList.add('hidden');
+            document.getElementById('welcomeView').classList.remove('hidden');
+            document.getElementById('actionPills').classList.remove('hidden');
+            document.getElementById('messageContainer').innerHTML = '';
+            document.getElementById('chatInput').value = '';
+            renderHistory();
+        }
+
+        async function sendMessage(text) {
+            const input = text || document.getElementById('chatInput').value.trim();
+            if (!input) return;
+
+            if (!currentChatId) {
+                currentChatId = Date.now();
+                allChats.unshift({ id: currentChatId, title: input, messages: [] });
             }
-            saveChatsToStorage();
-            updateChatList();
-        }
 
-        function displayMessages(messages) {
-            const messagesContainer = document.getElementById('chatMessages');
-            messagesContainer.innerHTML = '';
-            
-            messages.forEach(msg => {
-                addMessageToDOM(msg.content, msg.isUser);
-            });
-        }
+            document.getElementById('chatInput').value = '';
+            document.getElementById('welcomeView').classList.add('hidden');
+            document.getElementById('actionPills').classList.add('hidden');
+            document.getElementById('messageArea').classList.remove('hidden');
 
-        function addMessageToDOM(content, isUser = false) {
-            const messagesContainer = document.getElementById('chatMessages');
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message ${isUser ? 'user' : 'ai'}`;
-            
-            if (!isUser) {
-                const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-                icon.setAttribute('class', 'message-icon');
-                icon.setAttribute('viewBox', '0 0 100 100');
-                icon.innerHTML = '<path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"></path>';
-                messageDiv.appendChild(icon);
-            }
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            
-            // Simple formatting - just convert line breaks
-            const formattedContent = formatMessageContent(content);
-            bubble.innerHTML = formattedContent;
-            
-            messageDiv.appendChild(bubble);
-            
-            messagesContainer.appendChild(messageDiv);
-            messagesContainer.parentElement.scrollTop = messagesContainer.parentElement.scrollHeight;
-        }
-
-        function formatMessageContent(content) {
-            // Use marked.js to parse markdown to HTML
-            const html = marked.parse(content);
-            return html;
-        }
-
-        function copyCode(codeId) {
-            const codeElement = document.getElementById(codeId);
-            const text = codeElement.textContent;
-            navigator.clipboard.writeText(text).then(() => {
-                // Show copied feedback
-                const button = event.target.closest('.copy-button');
-                const originalHTML = button.innerHTML;
-                button.innerHTML = '<span style="color: #4CAF50;">✓ Copied</span>';
-                setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                }, 2000);
-            });
-        }
-
-        function addMessage(content, isUser = false) {
             const chat = allChats.find(c => c.id === currentChatId);
-            if (chat) {
-                chat.messages.push({ content, isUser });
-                
-                // Update chat title with first message
-                if (chat.messages.length === 1 && isUser) {
-                    chat.title = content.substring(0, 30) + (content.length > 30 ? '...' : '');
-                }
-                
-                // Hide welcome after first message
-                if (chat.messages.length > 0) {
-                    document.getElementById('welcomeSection').classList.add('hidden');
-                    document.getElementById('actionButtons').classList.add('hidden');
-                }
-                
-                addMessageToDOM(content, isUser);
-                saveChatsToStorage();
-                updateChatList();
-            }
-        }
+            chat.messages.push({ role: 'user', content: input });
+            renderMessages();
 
-        function showLoading() {
-            const messagesContainer = document.getElementById('chatMessages');
-            const loadingDiv = document.createElement('div');
-            loadingDiv.className = 'message ai';
-            loadingDiv.id = 'loadingMessage';
+            const aiMsg = { role: 'assistant', content: '' };
+            chat.messages.push(aiMsg);
             
-            const icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-            icon.setAttribute('class', 'message-icon');
-            icon.setAttribute('viewBox', '0 0 100 100');
-            icon.innerHTML = '<path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z"></path>';
-            
-            const bubble = document.createElement('div');
-            bubble.className = 'bubble';
-            bubble.innerHTML = '<span class="loading"></span><span class="loading" style="margin-left: 8px;"></span><span class="loading" style="margin-left: 8px;"></span>';
-            
-            loadingDiv.appendChild(icon);
-            loadingDiv.appendChild(bubble);
-            messagesContainer.appendChild(loadingDiv);
-            messagesContainer.parentElement.scrollTop = messagesContainer.parentElement.scrollHeight;
-        }
-
-        function removeLoading() {
-            const loadingDiv = document.getElementById('loadingMessage');
-            if (loadingDiv) {
-                loadingDiv.remove();
-            }
-        }
-
-        async function sendMessage() {
-            const messageInput = document.getElementById('messageInput');
-            const sendButton = document.getElementById('sendButton');
-            const message = messageInput.value.trim();
-
-            if (!message || !isAuthenticated) return;
-
-            // Add user message
-            addMessage(message, true);
-            messageInput.value = '';
-            sendButton.disabled = true;
-
-            // Show loading
-            showLoading();
+            const sendBtn = document.getElementById('sendBtn');
+            sendBtn.disabled = true;
 
             try {
-                // Call Puter AI with Claude Sonnet - using stream like the old working code
-                const response = await puter.ai.chat(message, {
-                    model: 'claude-sonnet',
-                    stream: true
-                });
-
-                removeLoading();
-                let fullResponse = '';
-
-                // Stream the response like the old code
+                const response = await puter.ai.chat(input, { model: 'claude-sonnet', stream: true });
                 for await (const part of response) {
-                    fullResponse += part?.text || '';
+                    aiMsg.content += part?.text || '';
+                    renderMessages();
+                    const area = document.getElementById('messageArea');
+                    area.scrollTop = area.scrollHeight;
                 }
-
-                // Debug: log what we received
-                console.log('Received from API:', fullResponse);
-
-                // Check if API stripped code blocks and replaced with placeholders
-                if (fullResponse.match(/CODEBLOCK\d+/i)) {
-                    console.warn('API returned CODEBLOCK placeholders - code was stripped');
-                    // Replace placeholders with a helpful message
-                    fullResponse = fullResponse.replace(/CODEBLOCK\d+/gi, '\n[Code block was removed by the API]\n');
-                }
-
-                addMessage(fullResponse, false);
-            } catch (error) {
-                removeLoading();
-                addMessage(`Error: ${error.message}`, false);
-                console.error('Chat error:', error);
+            } catch (err) {
+                aiMsg.content = "I encountered an error connecting to the AI. Please try again.";
+                renderMessages();
             } finally {
-                sendButton.disabled = false;
+                sendBtn.disabled = false;
+                saveData();
+                renderHistory();
             }
         }
 
-        function saveChatsToStorage() {
-            localStorage.setItem('claudeChats', JSON.stringify(allChats));
+        function sendPrompt(type) {
+            const prompts = {
+                'Write': "Help me write a creative story about a modern-day alchemist.",
+                'Learn': "Can you explain the concept of quantum entanglement in simple terms?",
+                'Code': "Write a clean Python script for a basic web scraper using BeautifulSoup.",
+                'Life stuff': "Give me 5 actionable tips for maintaining a healthy work-life balance.",
+                'Claude\'s choice': "Tell me something fascinating about the history of artificial intelligence."
+            };
+            sendMessage(prompts[type]);
         }
 
-        function loadChatsFromStorage() {
-            const saved = localStorage.getItem('claudeChats');
-            if (saved) {
-                allChats = JSON.parse(saved);
-                if (allChats.length > 0) {
-                    loadChat(allChats[allChats.length - 1].id);
-                } else {
-                    startNewChat();
-                }
-            } else {
-                startNewChat();
-            }
-        }
+        function renderMessages() {
+            const container = document.getElementById('messageContainer');
+            const chat = allChats.find(c => c.id === currentChatId);
+            if (!chat) return;
 
-        // Event listeners
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if already authenticated
-            puter.auth.getUser().then(user => {
-                if (user) {
-                    isAuthenticated = true;
-                    showMainInterface();
-                    loadChatsFromStorage();
-                }
-            }).catch(() => {
-                // User not authenticated, show login screen
+            container.innerHTML = chat.messages.map(m => `
+                <div class="flex gap-4 ${m.role === 'user' ? 'justify-end' : ''}">
+                    ${m.role === 'assistant' ? `
+                        <div class="w-8 h-8 rounded-full bg-[#3d3d3d] flex items-center justify-center shrink-0">
+                            <svg width="18" height="18" viewBox="0 0 100 100" fill="none" class="text-[#d97757]">
+                                <path d="M50 0L54.4 33.6L85.4 14.6L66.4 45.6L100 50L66.4 54.4L85.4 85.4L54.4 66.4L50 100L45.6 66.4L14.6 85.4L33.6 54.4L0 50L33.6 45.6L14.6 14.6L45.6 33.6L50 0Z" fill="currentColor"/>
+                            </svg>
+                        </div>
+                    ` : ''}
+                    <div class="prose max-w-full ${m.role === 'user' ? 'bg-[#2f2f2f] text-white p-4 rounded-2xl max-w-[80%]' : 'text-gray-200 flex-1'}">
+                        ${marked.parse(m.content)}
+                    </div>
+                </div>
+            `).join('');
+            
+            document.querySelectorAll('pre code').forEach((block) => {
+                hljs.highlightElement(block);
             });
+        }
 
-            // Initialize Lucide icons
+        function renderHistory() {
+            const container = document.getElementById('chatHistory');
+            container.innerHTML = allChats.map(c => `
+                <div onclick="loadChat(${c.id})" class="sidebar-item ${c.id === currentChatId ? 'active-sidebar-item' : ''} group">
+                    <span class="truncate flex-1">${c.title}</span>
+                    <button onclick="deleteChat(event, ${c.id})" class="opacity-0 group-hover:opacity-100 p-1 hover:bg-[#3d3d3d] rounded transition-all">
+                        <i data-lucide="trash-2" class="w-3.5 h-3.5 text-gray-500"></i>
+                    </button>
+                </div>
+            `).join('');
             lucide.createIcons();
-        });
+        }
 
-        // Add event listeners after DOM is loaded
-        window.addEventListener('load', () => {
-            const sendButton = document.getElementById('sendButton');
-            const messageInput = document.getElementById('messageInput');
-            
-            if (sendButton) {
-                sendButton.addEventListener('click', sendMessage);
-            }
-            
-            if (messageInput) {
-                messageInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter' && !e.shiftKey) {
-                        e.preventDefault();
-                        sendMessage();
-                    }
-                });
-            }
-        });
+        function loadChat(id) {
+            currentChatId = id;
+            document.getElementById('welcomeView').classList.add('hidden');
+            document.getElementById('actionPills').classList.add('hidden');
+            document.getElementById('messageArea').classList.remove('hidden');
+            renderMessages();
+            renderHistory();
+        }
 
-        // Initialize Lucide icons
-        lucide.createIcons();
+        function deleteChat(e, id) {
+            e.stopPropagation();
+            allChats = allChats.filter(c => c.id !== id);
+            if (currentChatId === id) startNewChat();
+            saveData();
+            renderHistory();
+        }
+
+        function saveData() {
+            localStorage.setItem('claude_history', JSON.stringify(allChats));
+        }
+
+        document.getElementById('sendBtn').onclick = () => sendMessage();
+        document.getElementById('chatInput').onkeydown = (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        };
+
+        init();
     </script>
 </body>
 </html>
