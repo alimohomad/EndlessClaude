@@ -91,7 +91,7 @@
         }
 
         .nav-item:hover {
-            background-color: #1A1A1A;
+            background-color: rgba(255, 255, 255, 0.05);
             color: #FFFFFF;
         }
 
@@ -170,7 +170,7 @@
         }
 
         .chat-item:hover {
-            background-color: #1A1A1A;
+            background-color: rgba(255, 255, 255, 0.05);
             color: #FFFFFF;
         }
 
@@ -180,7 +180,7 @@
         }
 
         .chat-item.active {
-            background-color: #1A1A1A;
+            background-color: rgba(255, 255, 255, 0.08);
             color: #FFFFFF;
         }
 
@@ -201,11 +201,11 @@
             transition: opacity 0.2s, visibility 0.2s;
             position: absolute;
             right: 8px;
-            background-color: #0F0F0F;
+            background-color: #171717;
         }
 
         .chat-options:hover {
-            background-color: #1A1A1A;
+            background-color: rgba(255, 255, 255, 0.1);
         }
             background-color: rgba(255, 255, 255, 0.1);
         }
@@ -315,7 +315,7 @@
         }
 
         .footer-btn:hover {
-            background-color: #1A1A1A;
+            background-color: rgba(255, 255, 255, 0.05);
             color: #FFFFFF;
         }
 
@@ -407,14 +407,14 @@
         }
 
         .logo-icon {
-            width: 26px;
-            height: 26px;
+            width: 28px;
+            height: 28px;
             display: inline-block;
             margin-right: 8px;
             vertical-align: middle;
             fill: #FF7A45;
-            opacity: 0.85;
-            transform: scale(0.8);
+            opacity: 0.9;
+            transform: scale(0.9);
         }
 
         .welcome-text {
@@ -429,21 +429,23 @@
         .chat-container {
             flex: 1;
             overflow-y: auto;
-            padding: 80px 40px 140px 120px;
-            max-width: 1000px;
+            padding: 20px;
+            padding-bottom: 140px;
+            max-width: 800px;
             width: 100%;
+            margin: 0 auto;
         }
 
         /* Chat Messages */
         .chat-messages {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
 
         .message {
             display: flex;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             animation: fadeIn 0.3s ease;
         }
 
@@ -457,54 +459,51 @@
         }
 
         .message-icon {
-            width: 22px;
-            height: 22px;
+            width: 24px;
+            height: 24px;
             fill: #FF7A45;
-            opacity: 0.85;
+            opacity: 0.9;
             flex-shrink: 0;
             margin-top: 4px;
-            transform: scale(0.8);
         }
 
         .bubble {
-            max-width: 65%;
-            padding: 10px 14px;
+            max-width: 70%;
+            padding: 12px 16px;
             border-radius: 14px;
             font-size: 15px;
             line-height: 1.6;
             font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            font-weight: 400;
         }
 
         .user .bubble {
-            background-color: #F9733F;
+            background-color: #FF7A45;
             color: #FFFFFF;
         }
 
         .ai .bubble {
-            background-color: #1A1A1A;
-            color: #D1D1D1;
+            background-color: #1E1E1E;
+            color: #E5E5E5;
         }
 
         /* Input Container */
         .input-container {
             position: fixed;
-            bottom: 24px;
+            bottom: 20px;
             left: 320px;
             right: 20px;
             display: flex;
-            justify-content: flex-start;
-            padding-left: 120px;
+            justify-content: center;
             z-index: 100;
         }
 
         .input-wrapper {
             width: 100%;
-            max-width: 760px;
-            background: #1A1A1A;
+            max-width: 800px;
+            background: #1E1E1E;
             border-radius: 16px;
             padding: 12px 16px;
-            box-shadow: 0 0 0 1px #2A2A2A;
+            box-shadow: 0 0 0 1px #2C2C2C;
             display: flex;
             align-items: center;
             gap: 12px;
@@ -626,12 +625,12 @@
 
         .action-btn {
             background: transparent;
-            border: 1px solid #2A2A2A;
+            border: 1px solid #333333;
             color: #B3B3B3;
             padding: 10px 18px;
             border-radius: 10px;
             font-size: 14px;
-            font-weight: 400;
+            font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
             display: flex;
@@ -641,7 +640,7 @@
         }
 
         .action-btn:hover {
-            border-color: #444444;
+            border-color: #555555;
             color: #FFFFFF;
         }
 
@@ -649,7 +648,6 @@
             width: 16px;
             height: 16px;
             stroke: #B3B3B3;
-            stroke-width: 1.5;
         }
 
         .action-btn:hover i {
