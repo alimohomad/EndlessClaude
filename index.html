@@ -34,13 +34,14 @@
         }
 
         .sidebar {
-            width: 260px;
+            width: 280px;
+            min-width: 280px;
             background-color: #171717;
             display: flex;
             flex-direction: column;
             padding: 0;
             border-right: 1px solid #2A2A2A;
-            overflow-y: auto;
+            overflow: hidden;
         }
 
         .sidebar-top {
@@ -68,7 +69,7 @@
         }
 
         .sidebar-nav {
-            padding: 8px;
+            padding: 4px 8px;
         }
 
         .nav-item {
@@ -86,6 +87,12 @@
             user-select: none;
         }
 
+        .nav-item span {
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
         .nav-item:hover {
             background-color: rgba(255, 255, 255, 0.05);
             color: #FFFFFF;
@@ -98,17 +105,19 @@
 
         .sidebar-section {
             flex: 1;
-            padding: 16px 12px 8px;
+            padding: 8px 8px;
             overflow-y: auto;
+            min-height: 0;
         }
 
         .section-title {
-            font-size: 12px;
+            font-size: 11px;
             color: #666666;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 8px;
-            padding: 0 12px;
+            padding: 8px 12px 4px;
+            font-weight: 500;
         }
 
         .sidebar-header {
@@ -200,6 +209,8 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .user-profile {
@@ -207,6 +218,7 @@
             align-items: center;
             gap: 10px;
             flex: 1;
+            min-width: 0;
         }
 
         .user-avatar {
@@ -224,17 +236,24 @@
 
         .user-info {
             flex: 1;
+            min-width: 0;
         }
 
         .user-name {
             font-size: 14px;
             color: #FFFFFF;
             font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .user-plan {
             font-size: 12px;
             color: #666666;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .footer-actions {
@@ -256,9 +275,9 @@
             transition: all 0.2s;
         }
 
-        .footer-btn:hover {
-            background-color: rgba(255, 255, 255, 0.05);
-            color: #FFFFFF;
+        .footer-btn i {
+            width: 16px;
+            height: 16px;
         }
 
         /* Sidebar */
@@ -427,7 +446,7 @@
         .input-container {
             position: fixed;
             bottom: 20px;
-            left: 260px;
+            left: 280px;
             right: 20px;
             display: flex;
             justify-content: center;
