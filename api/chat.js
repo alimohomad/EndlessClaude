@@ -28,22 +28,7 @@ module.exports = async (req, res) => {
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
         
-        // --- IP Whitelisting Security ---
-        const clientIpHeader = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
-        const clientIp = clientIpHeader.split(',')[0].trim();
-        
-        const { data: allowedIps } = await supabase.from('allowed_ips').select('ip_address');
-        
-        if (allowedIps && allowedIps.length > 0) {
-            const isAllowed = allowedIps.some(item => item.ip_address === clientIp);
-            if (!isAllowed) {
-                console.warn(`Unauthorized IP access attempt: ${clientIp}`);
-                res.status(403).json({ error: "Forbidden: Your IP is not authorized for this environment." });
-                return;
-            }
-        }
-
-        // --- API Key Retrieval & Caching ---
+        // API Key Retrieval & Caching ---
         let apiKeys;
         const now = Date.now();
         if (cachedKeys && (now - lastFetchTime < CACHE_DURATION)) {

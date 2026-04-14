@@ -87,7 +87,22 @@
     </div>
 
     <script>
-        lucide.createIcons();
+        async function init() {
+            // --- NEW: IP Security Check ---
+            try {
+                const res = await fetch('/api/verify-admin');
+                if (res.status === 403) {
+                    window.location.href = '/'; 
+                    return;
+                }
+            } catch (e) {
+                console.warn("Security check bypassed or failed:", e);
+            }
+
+            lucide.createIcons();
+            fetchData();
+        }
+        
         let currentPass = '';
         let supabaseClient = null;
 
