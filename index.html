@@ -241,23 +241,24 @@
         </div>
     </div>
 
-    <!-- Supabase Auth Logic Modals -->
-    <div id="loginScreen"
-        class="hidden fixed inset-0 flex items-center justify-center p-6 z-[4000] bg-black/80 backdrop-blur-sm">
-        <div class="max-w-md w-full text-center bg-[#212121] p-10 rounded-3xl border border-[#333] shadow-2xl">
-            <div class="mb-8">
-                <h1 class="font-serif text-3xl text-white italic">Welcome back</h1>
-                <p class="text-gray-400 mt-2">Sign in to your Premium workspace.</p>
+    <!-- Auth Overlay -->
+    <div id="authOverlay" class="fixed inset-0 z-[4000] bg-black/80 backdrop-blur-sm flex items-center justify-center p-6">
+        <div class="max-w-md w-full bg-[#212121] p-10 rounded-3xl border border-[#333] shadow-2xl animate-in fade-in zoom-in duration-300">
+            <div class="text-center mb-8">
+                <svg width="40" height="40" viewBox="0 0 100 100" fill="none" class="text-[#d97757] mx-auto mb-6"><path d="m19.6 66.5 19.7-11 .3-1-.3-.5h-1l-3.3-.2-11.2-.3L14 53l-9.5-.5-2.4-.5L0 49l.2-1.5 2-1.3 2.9.2 6.3.5 9.5.6 6.9.4L38 49.1h1.6l.2-.7-.5-.4-.4-.4L29 41l-10.6-7-5.6-4.1-3-2-1.5-2-.6-4.2 2.7-3 3.7.3.9.2 3.7 2.9 8 6.1L37 36l1.5 1.2.6-.4.1-.3-.7-1.1L33 25l-6-10.4-2.7-4.3-.7-2.6c-.3-1-.4-2-.4-3l3-4.2L28 0l4.2.6L33.8 2l2.6 6 4.1 9.3L47 29.9l2 3.8 1 3.4.3 1h.7v-.5l.5-7.2 1-8.7 1-11.2.3-3.2 1.6-3.8 3-2L61 2.6l2 2.9-.3 1.8-1.1 7.7L59 27.1l-1.5 8.2h.9l1-1.1 4.1-5.4 6.9-8.6 3-3.5L77 13l2.3-1.8h4.3l3.1 4.7-1.4 4.9-4.4 5.6-3.7 4.7-5.3 7.1-3.2 5.7.3.4h.7l12-2.6 6.4-1.1 7.6-1.3 3.5 1.6.4 1.6-1.4 3.4-8.2 2-9.6 2-14.3 3.3-.2.1.2.3 6.4.6 2.8.2h6.8l12.6 1 3.3 2 1.9 2.7-.3 2-5.1 2.6-6.8-1.6-16-3.8-5.4-1.3h-.8v.4l4.6 4.5 8.3 7.5L89 80.1l.5 2.4-1.3 2-1.4-.2-9.2-7-3.6-3-8-6.8h-.5v.7l1.8 2.7 9.8 14.7.5 4.5-.7 1.4-2.6 1-2.7-.6-5.8-8-6-9-4.7-8.2-.5.4-2.9 30.2-1.3 1.5-3 1.2-2.5-2-1.4-3 1.4-6.2 1.6-8 1.3-6.4 1.2-7.9.7-2.6v-.2H49L43 72l-9 12.3-7.2 7.6-1.7.7-3-1.5.3-2.8L24 86l10-12.8 6-7.9 4-4.6-.1-.5h-.3L17.2 77.4l-4.7.6-2-2 .2-3 1-1 8-5.5Z" fill="currentColor"/></svg>
+                <h1 id="authTitle" class="text-3xl font-serif text-white italic mb-2">Welcome to Claude</h1>
+                <p id="authSubtitle" class="text-gray-400">Sign in to continue to your workspace</p>
             </div>
-            <input type="email" id="loginEmail" placeholder="Email"
-                class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757]">
-            <input type="password" id="loginPass" placeholder="Password"
-                class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757] mt-3">
-            <button onclick="performLogin()" id="loginBtn"
-                class="w-full py-3.5 mt-6 bg-[#d97757] hover:bg-[#c06548] text-white font-semibold rounded-xl transition-all">
-                Sign In
-            </button>
-            <p id="loginErr" class="text-red-400 text-sm mt-3 hidden"></p>
+            
+            <div class="space-y-4">
+                <input type="email" id="authEmail" placeholder="Email address" class="w-full bg-[#1a1a1a] border border-[#444] rounded-xl px-4 py-3 text-white outline-none focus:border-[#d97757] transition-all" />
+                <input type="password" id="authPassword" placeholder="Password" class="w-full bg-[#1a1a1a] border border-[#444] rounded-xl px-4 py-3 text-white outline-none focus:border-[#d97757] transition-all" />
+                <button onclick="handleAuth()" id="authBtn" class="w-full py-3.5 bg-[#d97757] text-white rounded-xl font-semibold hover:bg-[#c66a4a] transition-all">Sign In</button>
+            </div>
+
+            <div class="text-center mt-6">
+                <button onclick="toggleAuthMode()" id="authModeToggle" class="text-sm text-gray-500 hover:text-white transition-colors">Don't have an account? Sign Up</button>
+            </div>
         </div>
     </div>
 
@@ -410,8 +411,25 @@
                                         class="w-5 h-5"></i></button>
                             </div>
                             <div class="flex items-center gap-3">
-                                <div class="relative flex items-center pr-2">
-                                    <span class="font-medium text-[13px] text-gray-400 select-none">Sonnet 4.6</span>
+                                <div class="relative group">
+                                    <button id="modelSelectBtn" class="flex items-center gap-1.5 px-3 py-1.5 hover:bg-[#2f2f2f] rounded-lg text-[13px] font-medium text-gray-400 transition-colors">
+                                        <span id="currentModelLabel">Sonnet 4.6</span>
+                                        <i data-lucide="chevron-down" class="w-3 h-3"></i>
+                                    </button>
+                                    <div id="modelDropdown" class="hidden absolute bottom-full mb-2 right-0 bg-[#1d1d1d] border border-[#333] rounded-xl py-1 w-40 shadow-2xl animate-in fade-in slide-in-from-bottom-2 duration-200">
+                                        <button onclick="selectModel('sonnet')" class="w-full flex items-center justify-between px-3 py-2 text-[13px] text-gray-300 hover:bg-[#2f2f2f]">
+                                            Sonnet 4.6
+                                            <i data-lucide="check" class="w-4 h-4 text-[#d97757]" id="check-sonnet"></i>
+                                        </button>
+                                        <button onclick="selectModel('opus')" class="w-full flex items-center justify-between px-3 py-2 text-[13px] text-gray-300 hover:bg-[#2f2f2f]">
+                                            Opus 4.6
+                                            <i data-lucide="check" class="w-4 h-4 text-[#d97757] hidden" id="check-opus"></i>
+                                        </button>
+                                        <button onclick="selectModel('haiku')" class="w-full flex items-center justify-between px-3 py-2 text-[13px] text-gray-300 hover:bg-[#2f2f2f]">
+                                            Haiku 4.5
+                                            <i data-lucide="check" class="w-4 h-4 text-[#d97757] hidden" id="check-haiku"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <button onclick="sendMessage()" id="sendBtn"
                                     class="p-1 text-gray-500 hover:text-[#d97757] transition-colors"><i
@@ -603,98 +621,90 @@
         let isSidebarCollapsed = false;
 
         let supabaseClient = null;
+        let currentView = 'chat';
         let currentUser = null;
+        let selectedModel = 'sonnet';
 
         async function init() {
-            lucide.createIcons();
-            updateGreeting();
-            renderHistory();
-
             const sbUrl = 'https://zbgljlughkavbzueopjx.supabase.co';
             const sbKey = 'sb_publishable_otdTGesO-mgeHQuXHIVZcA_ZluiPs3b';
-            if (typeof supabase !== 'undefined') {
-                supabaseClient = supabase.createClient(sbUrl, sbKey);
-                const { data } = await supabaseClient.auth.getSession();
-                if (data.session) {
-                    await handlePostLogin(data.session.user);
+            supabaseClient = supabase.createClient(sbUrl, sbKey);
+
+            // Check for current user session
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session) {
+                currentUser = session.user;
+                document.getElementById('authOverlay').classList.add('hidden');
+                updateGreeting(currentUser.email.split('@')[0]);
+                document.getElementById('userEmail').textContent = currentUser.email;
+                renderHistory();
+            } else {
+                document.getElementById('authOverlay').classList.remove('hidden');
+            }
+            lucide.createIcons();
+        }
+
+        // --- Model Selector Logic ---
+        document.getElementById('modelSelectBtn').onclick = (e) => {
+            e.stopPropagation();
+            const dropdown = document.getElementById('modelDropdown');
+            dropdown.classList.toggle('hidden');
+        };
+
+        window.onclick = () => {
+            document.getElementById('modelDropdown').classList.add('hidden');
+            document.getElementById('userMenu').classList.add('hidden');
+        };
+
+        function selectModel(model) {
+            selectedModel = model;
+            const labels = { 'sonnet': 'Sonnet 4.6', 'opus': 'Opus 4.6', 'haiku': 'Haiku 4.5' };
+            document.getElementById('currentModelLabel').textContent = labels[model];
+            document.getElementById('check-sonnet').classList.toggle('hidden', model !== 'sonnet');
+            document.getElementById('check-opus').classList.toggle('hidden', model !== 'opus');
+            document.getElementById('check-haiku').classList.toggle('hidden', model !== 'haiku');
+            document.getElementById('modelDropdown').classList.add('hidden');
+        }
+
+        // --- Auth Logic ---
+        let authMode = 'login';
+        function toggleAuthMode() {
+            authMode = authMode === 'login' ? 'signup' : 'login';
+            document.getElementById('authTitle').textContent = authMode === 'login' ? 'Welcome to Claude' : 'Create Account';
+            document.getElementById('authSubtitle').textContent = authMode === 'login' ? 'Sign in to continue to your workspace' : 'Join Claude and start exploring intelligence';
+            document.getElementById('authBtn').textContent = authMode === 'login' ? 'Sign In' : 'Sign Up';
+            document.getElementById('authModeToggle').textContent = authMode === 'login' ? "Don't have an account? Sign Up" : "Already have an account? Sign In";
+        }
+
+        async function handleAuth() {
+            const email = document.getElementById('authEmail').value;
+            const password = document.getElementById('authPassword').value;
+            const btn = document.getElementById('authBtn');
+            btn.innerHTML = '<i data-lucide="loader-2" class="w-4 h-4 animate-spin mx-auto"></i>';
+            lucide.createIcons();
+
+            if (authMode === 'login') {
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+                if (error) {
+                    alert(error.message);
+                    btn.textContent = 'Sign In';
                 } else {
-                    document.getElementById('loginScreen').classList.remove('hidden');
+                    location.reload();
                 }
             } else {
-                console.error("Supabase script failed to load. Check network.");
+                const { data, error } = await supabaseClient.auth.signUp({ 
+                    email, 
+                    password,
+                    options: { data: { full_name: email.split('@')[0] } }
+                });
+                if (error) {
+                    alert(error.message);
+                    btn.textContent = 'Sign Up';
+                } else {
+                    alert("Account created! Check your email for verification.");
+                    toggleAuthMode();
+                }
             }
-        }
-
-        async function performLogin() {
-            const email = document.getElementById('loginEmail').value;
-            const pass = document.getElementById('loginPass').value;
-            const err = document.getElementById('loginErr');
-            const btn = document.getElementById('loginBtn');
-            if (!email || !pass) return;
-
-            btn.textContent = "Authenticating..."; btn.disabled = true;
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-            if (error) {
-                err.textContent = error.message; err.classList.remove('hidden');
-                btn.textContent = "Sign In"; btn.disabled = false;
-            } else {
-                document.getElementById('loginScreen').classList.add('hidden');
-                await handlePostLogin(data.user);
-            }
-        }
-
-        async function handlePostLogin(user) {
-            currentUser = user;
-            document.getElementById('userName').textContent = user.email.split('@')[0];
-            document.getElementById('userEmail').textContent = user.email;
-            document.getElementById('userInit').textContent = user.email[0].toUpperCase();
-
-            // Check promo status
-            const { data: profile } = await supabaseClient.from('profiles').select('plan_expiration').eq('id', user.id).single();
-            const now = new Date();
-            const expiry = profile?.plan_expiration ? new Date(profile.plan_expiration) : null;
-
-            if (!expiry || expiry < now) {
-                document.getElementById('promoScreen').classList.remove('hidden');
-            }
-        }
-
-        async function redeemPromo() {
-            const code = document.getElementById('promoInput').value;
-            const err = document.getElementById('promoErr');
-            const btn = document.getElementById('promoBtn');
-            if (!code) return;
-
-            btn.textContent = "Verifying..."; btn.disabled = true;
-
-            // Find Code (Bypass secure updates natively via simple Select and client Update since policies handle it if customized)
-            const { data: promo } = await supabaseClient.from('promo_codes').select('*').eq('code', code).eq('is_used', false).single();
-            if (!promo) {
-                err.textContent = "Invalid or already used promo code."; err.classList.remove('hidden');
-                btn.textContent = "Redeem Code"; btn.disabled = false;
-                return;
-            }
-
-            // Calculate new expiry
-            const days = promo.duration_days;
-            const newExpiry = new Date();
-            newExpiry.setDate(newExpiry.getDate() + days);
-
-            // Update Promo
-            await supabaseClient.from('promo_codes').update({ is_used: true, used_by: currentUser.id }).eq('id', promo.id);
-            // Update Profile
-            await supabaseClient.from('profiles').update({ plan_expiration: newExpiry.toISOString() }).eq('id', currentUser.id);
-
-            document.getElementById('promoScreen').classList.add('hidden');
-            alert(`Successfully redeemed ${days} days!`);
-        }
-
-        function handleLogin() {
-            if (supabaseClient) document.getElementById('loginScreen').classList.remove('hidden');
-        }
-
-        function handleLogout() {
-            alert("Logout disabled in this open instance.");
         }
 
         async function copyToClipboard(text) {
@@ -876,7 +886,11 @@
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: aiMessages })
+                    body: JSON.stringify({
+                        messages: aiMessages,
+                        model: selectedModel, // Now passing the selected model to the backend
+                        projectId: project?.id
+                    })
                 });
 
                 if (!response.ok) throw new Error("HTTP " + response.status);
@@ -1218,12 +1232,10 @@
                             <div class="p-6 border border-[#333] rounded-2xl bg-[#1d1d1d]">
                                 <p class="text-[13px] text-gray-400 mb-4 font-mono">POST https://antclaude.dev/api/v1</p>
                                 <div class="bg-[#111] p-4 rounded-xl text-[12px] text-gray-400 font-mono space-y-2">
-                                    <div class="text-[#d97757]">Invoke-RestMethod -Uri "https://antclaude.dev/api/v1?key=YOUR_NEW_KEY"  \\</div>
-                                    <div class="pl-4">-Method POST  \\</div>
-                                    <div class="pl-4">-Headers @{" \\</div>
-                                    <div class="pl-4">    "Content-Type" = "application/json"</div>
-                                    <div class="pl-4">} "</div>
-                                    <div class="pl-4"-Body '{"message":"Hello Claude!"}"</div>
+                                    <div class="text-[#d97757]">curl -X POST https://antclaude.dev/api/v1 \\</div>
+                                    <div class="pl-4">-H "Authorization: Bearer YOUR_KEY" \\</div>
+                                    <div class="pl-4">-H "Content-Type: application/json" \\</div>
+                                    <div class="pl-4">-d '{"messages": [{"role": "user", "content": "Hello Claude!"}]}'</div>
                                 </div>
                             </div>
                         </section>
