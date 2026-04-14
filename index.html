@@ -326,7 +326,7 @@
             <div id="userMenu" class="user-menu absolute hidden flex flex-col py-1 text-gray-300">
                 <div class="px-3 py-2 text-[12px] text-gray-500 border-b border-[#444] mb-1" id="userEmail">
                     Anonymous User</div>
-                <button class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
+                <button onclick="setView('settings'); toggleUserMenu()" class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
                         data-lucide="settings" class="w-4 h-4"></i> Settings</button>
                 <button class="flex items-center gap-2.5 px-3 py-1.5 hover:bg-[#3d3d3d] text-[13px] w-full text-left"><i
                         data-lucide="globe" class="w-4 h-4"></i> Language</button>
@@ -869,20 +869,8 @@
                     return { role: m.role, content: contentArr };
                 });
 
-                // Inject base identity and project context if applicable
-                let systemPrompt = "Your name is Claude (model Sonnet 4.6). You were trained by Anthropic. Act as a helpful assistant. ";
-                
-                if (project) {
-                    systemPrompt += `\n\n[PROJECT CONTEXT: ${project.name}]\n`;
-                    if (project.instructions) systemPrompt += `Specific Instructions for this Project: ${project.instructions}\n`;
-                    if (project.materials && project.materials.length > 0) {
-                        systemPrompt += `Shared Background/Materials:\n${project.materials.map(m => `--- ${m.title} ---\n${m.content}`).join('\n\n')}\n`;
-                    }
-                }
-
-                systemPrompt += "\nUse your internal reasoning/thoughts EXCLUSIVELY for hidden planning and logic. Do NOT repeat instructions in your reasoning.";
-
-                aiMessages.unshift({ role: "system", content: systemPrompt });
+                // The system prompt is now managed securely on the backend to prevent inspection in the Network tab.
+                // We only send the message history here.
 
                 const response = await fetch('/api/chat', {
                     method: 'POST',
