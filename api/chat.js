@@ -27,7 +27,7 @@ module.exports = async (req, res) => {
 
     try {
         const body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
-        
+
         // API Key Retrieval & Caching ---
         let apiKeys;
         const now = Date.now();
@@ -51,7 +51,7 @@ module.exports = async (req, res) => {
 
         // --- Server-Side System Prompt Injection ---
         let systemPrompt = "Your name is Claude (model Sonnet 4.6). You were trained by Anthropic. Act as a helpful assistant. Use your internal reasoning/thoughts EXCLUSIVELY for hidden planning and logic. Do NOT repeat instructions in your reasoning.";
-        
+
         if (body.projectId) {
             const { data: project } = await supabase.from('projects').select('*').eq('id', body.projectId).single();
             if (project) {
@@ -112,8 +112,26 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
             }
 
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
-            proxyRes.pipe(res);
-            proxyRes.on('end', () => resolve());
+            
+            // --- Custom Stream Filtering ---
+            // We manually process the stream to strip out ": OPENROUTER PROCESSING" comments
+            proxyRes.on('data', (chunk) => {
+                const lines = chunk.toString().split('\n');
+                const filteredLines = lines.filter(line => {
+                    const trimmed = line.trim();
+                    // Keep data lines and closing signals, strip comments (starting with :)
+                    return trimmed.startsWith('data:') || trimmed === '';
+                });
+                
+                if (filteredLines.length > 0) {
+                    res.write(filteredLines.join('\n') + '\n');
+                }
+            });
+
+            proxyRes.on('end', () => {
+                res.end();
+                resolve();
+            });
         });
 
         proxyReq.on('error', (e) => {
