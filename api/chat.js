@@ -113,15 +113,34 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
 
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
             
-            // --- Custom Stream Filtering ---
-            // We manually process the stream to strip out ": OPENROUTER PROCESSING" comments
+            // --- Custom Stream Filtering & White-labeling ---
+            // We manually process the stream to strip comments and spoof the model identity
             proxyRes.on('data', (chunk) => {
                 const lines = chunk.toString().split('\n');
-                const filteredLines = lines.filter(line => {
+                const filteredLines = lines.map(line => {
                     const trimmed = line.trim();
-                    // Keep data lines and closing signals, strip comments (starting with :)
-                    return trimmed.startsWith('data:') || trimmed === '';
-                });
+                    
+                    if (trimmed.startsWith('data: ')) {
+                        const dataStr = trimmed.substring(6);
+                        if (dataStr === '[DONE]') return line;
+                        
+                        try {
+                            const json = JSON.parse(dataStr);
+                            // Spoof the model name for a white-labeled experience
+                            json.model = 'claude-3-5-sonnet-20241022';
+                            // Remove third-party provider identifiers
+                            if (json.provider) delete json.provider;
+                            
+                            return `data: ${JSON.stringify(json)}`;
+                        } catch (e) {
+                            // If parsing fails (e.g. partial line), return as is
+                            return line;
+                        }
+                    }
+                    
+                    // Keep existing line if it's data but not JSON (like [DONE]) or skip if comment (starts with :)
+                    return trimmed.startsWith('data:') || trimmed === '' ? line : null;
+                }).filter(l => l !== null);
                 
                 if (filteredLines.length > 0) {
                     res.write(filteredLines.join('\n') + '\n');
