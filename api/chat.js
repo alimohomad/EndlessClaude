@@ -98,7 +98,7 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://endless-claude.vercel.app',
+                'HTTP-Referer': 'https://antclaude.dev',
                 'X-Title': 'Claude AI'
             }
         };
