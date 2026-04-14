@@ -944,15 +944,10 @@
                 // The system prompt is now managed securely on the backend to prevent inspection in the Network tab.
                 // We only send the message history here.
 
-                const selectedModel = document.getElementById('modelSelector').value;
-                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        messages: aiMessages,
-                        model: selectedModel
-                    })
+                    body: JSON.stringify({ messages: aiMessages })
                 });
 
                 if (!response.ok) throw new Error("HTTP " + response.status);
