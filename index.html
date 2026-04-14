@@ -246,18 +246,24 @@
         class="hidden fixed inset-0 flex items-center justify-center p-6 z-[4000] bg-black/80 backdrop-blur-sm">
         <div class="max-w-md w-full text-center bg-[#212121] p-10 rounded-3xl border border-[#333] shadow-2xl">
             <div class="mb-8">
-                <h1 class="font-serif text-3xl text-white italic">Welcome back</h1>
-                <p class="text-gray-400 mt-2">Sign in to your Premium workspace.</p>
+                <h1 class="font-serif text-3xl text-white italic" id="authTitle">Welcome back</h1>
+                <p class="text-gray-400 mt-2" id="authSubtitle">Sign in to your Premium workspace.</p>
             </div>
             <input type="email" id="loginEmail" placeholder="Email"
                 class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757]">
             <input type="password" id="loginPass" placeholder="Password"
                 class="w-full bg-[#1a1a1a] border border-[#444] rounded-lg px-4 py-3 text-white outline-none focus:border-[#d97757] mt-3">
-            <button onclick="performLogin()" id="loginBtn"
+            <button onclick="performAuth()" id="authBtn"
                 class="w-full py-3.5 mt-6 bg-[#d97757] hover:bg-[#c06548] text-white font-semibold rounded-xl transition-all">
                 Sign In
             </button>
             <p id="loginErr" class="text-red-400 text-sm mt-3 hidden"></p>
+            <div class="mt-6 pt-6 border-t border-[#333]">
+                <p class="text-gray-500 text-sm mb-3" id="authToggleText">Don't have an account?</p>
+                <button onclick="toggleAuthMode()" id="authToggleBtn" class="text-[#d97757] hover:text-[#c06548] text-sm font-medium">
+                    Create account
+                </button>
+            </div>
         </div>
     </div>
 
@@ -411,7 +417,11 @@
                             </div>
                             <div class="flex items-center gap-3">
                                 <div class="relative flex items-center pr-2">
-                                    <span class="font-medium text-[13px] text-gray-400 select-none">Sonnet 4.6</span>
+                                    <select id="modelSelector" class="bg-transparent border border-[#444] rounded-lg px-3 py-1.5 text-[13px] text-gray-300 outline-none focus:border-[#d97757] cursor-pointer hover:bg-[#2f2f2f] transition-colors">
+                                        <option value="anthropic/claude-3.5-sonnet" class="bg-[#2f2f2f]">Sonnet 4.6</option>
+                                        <option value="anthropic/claude-opus-4" class="bg-[#2f2f2f]">Opus 4.6</option>
+                                        <option value="anthropic/claude-3.5-haiku" class="bg-[#2f2f2f]">Haiku 4.5</option>
+                                    </select>
                                 </div>
                                 <button onclick="sendMessage()" id="sendBtn"
                                     class="p-1 text-gray-500 hover:text-[#d97757] transition-colors"><i
@@ -604,6 +614,7 @@
 
         let supabaseClient = null;
         let currentUser = null;
+        let isSignupMode = false;
 
         async function init() {
             lucide.createIcons();
@@ -625,21 +636,81 @@
             }
         }
 
-        async function performLogin() {
+        function toggleAuthMode() {
+            isSignupMode = !isSignupMode;
+            const title = document.getElementById('authTitle');
+            const subtitle = document.getElementById('authSubtitle');
+            const btn = document.getElementById('authBtn');
+            const toggleText = document.getElementById('authToggleText');
+            const toggleBtn = document.getElementById('authToggleBtn');
+            const err = document.getElementById('loginErr');
+            
+            err.classList.add('hidden');
+            
+            if (isSignupMode) {
+                title.textContent = "Create account";
+                subtitle.textContent = "Join the Premium workspace.";
+                btn.textContent = "Sign Up";
+                toggleText.textContent = "Already have an account?";
+                toggleBtn.textContent = "Sign in";
+            } else {
+                title.textContent = "Welcome back";
+                subtitle.textContent = "Sign in to your Premium workspace.";
+                btn.textContent = "Sign In";
+                toggleText.textContent = "Don't have an account?";
+                toggleBtn.textContent = "Create account";
+            }
+        }
+
+        async function performAuth() {
             const email = document.getElementById('loginEmail').value;
             const pass = document.getElementById('loginPass').value;
             const err = document.getElementById('loginErr');
-            const btn = document.getElementById('loginBtn');
+            const btn = document.getElementById('authBtn');
             if (!email || !pass) return;
 
-            btn.textContent = "Authenticating..."; btn.disabled = true;
-            const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
-            if (error) {
-                err.textContent = error.message; err.classList.remove('hidden');
-                btn.textContent = "Sign In"; btn.disabled = false;
+            const originalText = btn.textContent;
+            btn.textContent = isSignupMode ? "Creating account..." : "Authenticating...";
+            btn.disabled = true;
+
+            if (isSignupMode) {
+                const { data, error } = await supabaseClient.auth.signUp({ 
+                    email, 
+                    password: pass,
+                    options: {
+                        emailRedirectTo: window.location.origin
+                    }
+                });
+                if (error) {
+                    err.textContent = error.message; 
+                    err.classList.remove('hidden');
+                    btn.textContent = originalText; 
+                    btn.disabled = false;
+                } else {
+                    err.textContent = "Account created! Please check your email to verify.";
+                    err.classList.remove('hidden');
+                    err.classList.remove('text-red-400');
+                    err.classList.add('text-green-400');
+                    btn.textContent = originalText;
+                    btn.disabled = false;
+                    setTimeout(() => {
+                        toggleAuthMode();
+                        err.classList.add('hidden');
+                        err.classList.add('text-red-400');
+                        err.classList.remove('text-green-400');
+                    }, 3000);
+                }
             } else {
-                document.getElementById('loginScreen').classList.add('hidden');
-                await handlePostLogin(data.user);
+                const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password: pass });
+                if (error) {
+                    err.textContent = error.message; 
+                    err.classList.remove('hidden');
+                    btn.textContent = originalText; 
+                    btn.disabled = false;
+                } else {
+                    document.getElementById('loginScreen').classList.add('hidden');
+                    await handlePostLogin(data.user);
+                }
             }
         }
 
@@ -873,10 +944,15 @@
                 // The system prompt is now managed securely on the backend to prevent inspection in the Network tab.
                 // We only send the message history here.
 
+                const selectedModel = document.getElementById('modelSelector').value;
+                
                 const response = await fetch('/api/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ messages: aiMessages })
+                    body: JSON.stringify({ 
+                        messages: aiMessages,
+                        model: selectedModel
+                    })
                 });
 
                 if (!response.ok) throw new Error("HTTP " + response.status);
@@ -1216,9 +1292,9 @@
                         <section>
                             <h3 class="text-white font-medium mb-4">Documentation</h3>
                             <div class="p-6 border border-[#333] rounded-2xl bg-[#1d1d1d]">
-                                <p class="text-[13px] text-gray-400 mb-4 font-mono">POST https://antclaude.vercel.app/api/v1</p>
+                                <p class="text-[13px] text-gray-400 mb-4 font-mono">POST https://antclaude.dev/api/v1</p>
                                 <div class="bg-[#111] p-4 rounded-xl text-[12px] text-gray-400 font-mono space-y-2">
-                                    <div class="text-[#d97757]">curl -X POST https://antclaude.vercel.app/api/v1 \\</div>
+                                    <div class="text-[#d97757]">curl -X POST https://antclaude.dev/api/v1 \\</div>
                                     <div class="pl-4">-H "Authorization: Bearer YOUR_KEY" \\</div>
                                     <div class="pl-4">-H "Content-Type: application/json" \\</div>
                                     <div class="pl-4">-d '{"message": "Hello Claude!"}'</div>
