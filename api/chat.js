@@ -60,18 +60,30 @@ module.exports = async (req, res) => {
             }
         }
 
-        const secureMessages = [{ role: 'system', content: systemPrompt }, ...(body.messages || [])];
-        const secureBody = { ...body, messages: secureMessages };
+        // --- NEW: Model Mapping Logic (Cosmetic Premium) ---
+        // All selections use the same powerful background model, but spoof different identities
+        // All selections use the same powerful background model, but spoof different identities
+        const targetModel = 'google/gemma-2-9b-it:free'; 
+        
+        const spoofMap = {
+            'sonnet': 'claude-3-5-sonnet-20241022',
+            'opus': 'claude-3-opus-20240229',
+            'haiku': 'claude-3-haiku-20240307'
+        };
+        const spoofedName = spoofMap[body.model] || spoofMap['sonnet'];
 
-        await tryOpenRouterProxy(secureBody, res, apiKeys, 0);
+        const secureMessages = [{ role: 'system', content: systemPrompt }, ...(body.messages || [])];
+        const secureBody = { ...body, model: targetModel, messages: secureMessages };
+
+        await tryOpenRouterProxy(secureBody, res, apiKeys, spoofedName, 0);
 
     } catch (err) {
         console.error("Critical API Error:", err);
-        res.status(500).send("Internal Server Error");
+        res.status(500).json({ error: "Internal Server Error", details: err.message });
     }
 };
 
-function tryOpenRouterProxy(data, res, apiKeys, attempts) {
+function tryOpenRouterProxy(data, res, apiKeys, spoofedName, attempts) {
     return new Promise((resolve) => {
         if (attempts >= apiKeys.length) {
             res.writeHead(500, { 'Content-Type': 'application/json' });
@@ -86,7 +98,7 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
         updatedApiKeys.splice(randomIndex, 1);
 
         const payload = {
-            model: data.model || "nvidia/nemotron-3-super-120b-a12b:free",
+            model: data.model,
             messages: data.messages,
             stream: true
         };
@@ -98,50 +110,46 @@ function tryOpenRouterProxy(data, res, apiKeys, attempts) {
             headers: {
                 'Authorization': `Bearer ${apiKey}`,
                 'Content-Type': 'application/json',
-                'HTTP-Referer': 'https://endless-claude.vercel.app',
+                'HTTP-Referer': 'https://antclaude.dev',
                 'X-Title': 'Claude AI'
             }
         };
 
         const proxyReq = https.request(options, (proxyRes) => {
             if (proxyRes.statusCode !== 200) {
-                console.log(`API Key failed with status ${proxyRes.statusCode}. Retrying...`);
-                proxyRes.on('data', () => {}); 
-                tryOpenRouterProxy(data, res, updatedApiKeys, attempts + 1).then(resolve);
+                let errorData = '';
+                proxyRes.on('data', (d) => { errorData += d; });
+                proxyRes.on('end', () => {
+                    console.log(`API Key failed with status ${proxyRes.statusCode}. Response: ${errorData}`);
+                    tryOpenRouterProxy(data, res, updatedApiKeys, spoofedName, attempts + 1).then(resolve);
+                });
                 return;
             }
 
             res.writeHead(proxyRes.statusCode, proxyRes.headers);
-            
+
             // --- Custom Stream Filtering & White-labeling ---
-            // We manually process the stream to strip comments and spoof the model identity
             proxyRes.on('data', (chunk) => {
                 const lines = chunk.toString().split('\n');
                 const filteredLines = lines.map(line => {
                     const trimmed = line.trim();
-                    
+
                     if (trimmed.startsWith('data: ')) {
                         const dataStr = trimmed.substring(6);
                         if (dataStr === '[DONE]') return line;
-                        
+
                         try {
                             const json = JSON.parse(dataStr);
-                            // Spoof the model name for a white-labeled experience
-                            json.model = 'claude-3-5-sonnet-20241022';
-                            // Remove third-party provider identifiers
+                            json.model = spoofedName; // Dynamic spoofing
                             if (json.provider) delete json.provider;
-                            
                             return `data: ${JSON.stringify(json)}`;
                         } catch (e) {
-                            // If parsing fails (e.g. partial line), return as is
                             return line;
                         }
                     }
-                    
-                    // Keep existing line if it's data but not JSON (like [DONE]) or skip if comment (starts with :)
-                    return trimmed.startsWith('data:') || trimmed === '' ? line : null;
-                }).filter(l => l !== null);
-                
+                    return line;
+                });
+
                 if (filteredLines.length > 0) {
                     res.write(filteredLines.join('\n') + '\n');
                 }
